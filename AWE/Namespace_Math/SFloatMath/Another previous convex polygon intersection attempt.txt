@@ -1,0 +1,383 @@
+﻿
+        public static List<pair2f> GetIntersectionOfConvexPolygons (List<pair2f> polygon1, List<pair2f> polygon2) {
+
+            const int Intersection = -1,
+                      Polygon1 = 0,
+                      Polygon2 = 1;
+
+            var polygons = new Pair<List<pair2f>> (polygon1, polygon2);
+            var builder = new Queue<IntPair> ();
+            var intersections = new List<pair2f> ();
+            var segments = new Pair<List<IntPair>> (
+                GetLineSegmentIndiciesFromShape (polygon1),
+                GetLineSegmentIndiciesFromShape (polygon2)
+            );
+
+            // Start at the first segment.
+            var currentSegment = segments[0][0];
+
+            // Initialize search indicies.
+            var nexts = new IntPair (0, 0);
+
+            // Stop index for Polygon2 isn't determined yet.
+            var stops = new IntPair (0, -1);
+
+            // Default target is Polygon1.
+            var target = new IntPair (Polygon1, Polygon1);
+
+            // Setting up other miscellaneous variables to be used in the following loop.
+            var intersection = pair2f.nan;
+            var currentPolygon = polygon1;
+            var otherPolygon = polygon2;
+            var currentPoints = new Line2DSegment (
+                polygon1[currentSegment.one],
+                polygon1[currentSegment.two]
+            );
+            var otherSegments = segments[Polygon2];
+            var otherSegment = default(Line2DSegment);
+
+            do {
+
+                if (target.one == Polygon1) {
+
+                    if (IsPointInConvexShape (polygon1[currentSegment.one], polygon2)) {
+
+                        builder.Enqueue (new IntPair (Polygon1, currentSegment.one));
+
+                    } else {
+
+                        target = new IntPair (Intersection, Polygon1);
+
+                    }
+
+                } else if (!intersection.isNan && (target.two == Polygon1)) {
+
+                    intersection = pair2f.nan;
+                    target = new IntPair (Polygon1, Polygon1);
+
+                }
+
+                currentPolygon = polygons[target.two];
+                otherPolygon = polygons.opposite (target.two);
+                otherSegments = segments.opposite (target.two);
+
+                currentPoints = new Line2DSegment (
+                    currentPolygon[currentSegment.one],
+                    currentPolygon[currentSegment.two]
+                );
+                otherSegment = GetLineSegmentIntersectionOnShape (
+                    currentPoints,
+                    otherPolygon,
+                    nexts.opposite (target.two),
+                    otherSegments
+                );
+
+                if (otherSegment.HasValue) {
+
+                    var currentPolygonIndex = target.two;
+                    var otherSegmentValue = otherSegment.Value;
+
+                    if ((stops[Polygon2] < 0) && (currentPolygonIndex == Polygon1)) {
+
+                        stops = new IntPair (stops.one, otherSegmentValue.one);
+
+                    }
+
+                    var otherPoints = new Line2DSegment (
+                        otherPolygon[otherSegmentValue.one]
+                        otherPolygon[otherSegmentValue.two]
+                    );
+                    intersection = GetIntersectionOfLineSegments (
+                        currentPoints,
+                        otherPoints
+                    );
+
+                    // If the line segments are parallel...
+                    if (intersection.isNan) {
+
+                        var taildir = (otherPoints.tail - currentPoints.tail).ToDirection ();
+                        var headdir = (otherPoints.head - currentPoints.tail).ToDirection ();
+
+                        if (taildir == headdir) {
+
+                            builder.Enqueue (otherPolygonIndex, otherSegmentValue.one);
+
+                        } else {
+
+                            builder.Enqueue (currentPolygonIndex, currentSegment.one);
+
+                        }
+
+                        taildir = (otherPoints.tail - currentPoints.head).ToDirection ();
+                        headdir = (otherPoints.head - currentPoints.head).ToDirection ();
+
+                        if (taildir == headdir) {
+
+                            builder.Enqueue (otherPolygonIndex, otherSegmentValue.two);
+
+                        } else {
+
+                            builder.Enqueue (currentPolygonIndex, currentSegment.two);
+
+                        }
+
+                    } else {
+
+                        builder.Enqueue (Intersection, intersections.Count);
+                        intersections.Add (intersection);
+
+                        if (IsPointInConvexShape (otherPoints.head, currentPolygon)) {
+
+                            otherPolygonIndex = ((currentPolygonIndex == Polygon1) ? Polygon2 : Polygon1);
+                            builder.Enqueue (otherPolygonIndex, otherSegmentValue.two);
+                            target = new IntPair (Intersection, otherPolygonIndex);
+
+                        } else if (IsPointInConvexShape (currentPoints.head, otherPolygon)) {
+
+                            builder.Enqueue (currentPolygonIndex, currentSegment.two);
+                            target = new IntPair (Intersection, currentPolygonIndex);
+
+                        } else {
+
+                            var isSearching = true;
+                            var stop = otherSegmentValue.one;
+                            otherSegmentValue = otherSegments[otherSegmentValue.two];
+
+                            while (isSearching && (otherSegmentValue.one != stop)) {
+
+                                otherPoints = new Line2DSegment (
+                                    otherPolygon[otherSegmentValue.one]
+                                    otherPolygon[otherSegmentValue.two]
+                                );
+                                intersection = GetIntersectionOfLineSegments (
+                                    currentPoints,
+                                    otherPoints
+                                );
+
+                                if (!intersection.isNan) {
+
+                                    // Exit the loop
+                                    isSearching = false;
+
+                                } else {
+
+                                    otherSegmentValue = otherSegments[otherSegmentValue.two];
+
+                                }
+                            }
+
+                            if (isSearching) {
+
+                                // TODO - Throw an exception. The user has given an invalid polygon.
+
+                            }
+
+                            builder.Enqueue (Intersection, intersections.Count);
+                            intersections.Add (intersection);
+
+
+
+                            target = (
+                                (currentPolygonIndex == Polygon1)
+                                ? new IntPair (Polygon2, Polygon2)
+                                : new IntPair (Polygon1, Polygon1)
+                            );
+
+                        }
+                    }
+
+                    nexts = (
+                        (currentPolygonIndex == Polygon1)
+                        ? new IntPair (currentSegment.two, otherSegmentValue.two)
+                        : new IntPair (otherSegmentValue.two, currentSegment.two)
+                    );
+
+                    if (target.one != Intersection) {
+
+                        currentSegment = otherSegmentValue;
+
+                    }
+
+                } else {
+
+                    nexts = (
+                        (target.two == Polygon1)
+                        ? new IntPair (currentSegment.two, nexts.two)
+                        : new IntPair (nexts.one, currentSegment.two)
+                    );
+
+                }
+
+                if (target.one == Polygon2) {
+
+                    if (IsPointInConvexShape (polygon2[currentSegment.two], polygon1)) {
+
+                        builder.Enqueue (new IntPair (Polygon2, currentSegment.two));
+
+                    } else {
+
+                        target = new IntPair (Intersection, Polygon2);
+
+                    }
+
+                } else if (!intersection.isNan && (target.two == Polygon2)) {
+
+                    intersection = pair2f.nan;
+                    target = new IntPair (Polygon2, Polygon2);
+
+                }
+
+                currentSegment = segments[target.two][nexts[target.two]];
+
+            } while (currentSegment.one != stops[target.two]);
+
+            // By this point builder should have all the point destinations ready to build the overlap.
+            var overlap = new List<pair2f> ();
+
+            // If builder has nothing in it, check to see if Polygon2 is completely containted by Polygon1,
+            // since that's a case the above algorithm will miss.
+            if (builder.Count <= 0) {
+
+                for (int i = 0; i < polygon2.Count; i++) {
+
+                    if (IsPointInConvexShape (polygon2[i], polygon1)) {
+
+                        overlap.Add (polygon2[i]);
+
+                    }
+                }
+
+                // If Polygon2 is not entirely in Polygon1, then something is wrong with the inputs.
+                if (overlap.Count != polygon2.Count) {
+
+                    // TODO - Throw an exception. The user has given an invalid polygon.
+
+                }
+
+            } else {
+
+                while (builder.Count > 0) {
+
+                    var pair = builder.Dequeue ();
+
+                    switch (pair.one) {
+
+                    case Intersection:
+                        overlap.Add (intersections[pair.two]);
+                    break;
+
+                    case Polygon1:
+                        overlap.Add (polygon1[pair.two]);
+                    break;
+
+                    case Polygon2:
+                        overlap.Add (polygon2[pair.two]);
+                    break;
+
+                    }
+                }
+            }
+
+            return overlap;
+
+        }
+
+        private static IntPair? GetLineSegmentIntersectionOnShape (
+            Line2DSegment segment,
+            List<pair2f> shape,
+            int startIndex = 0,
+            List<IntPair> shapeSegments = null,
+            int endIndex = -1
+        ) {
+
+            IntPair? result = null;
+
+            if (shapeSegments == null) {
+
+                shapeSegments = GetLineSegmentIndiciesFromShape (shape);
+
+            }
+
+            if (endIndex < 0) {
+
+                endIndex = startIndex;
+
+            }
+
+            float distance = float.PositiveInfinity;
+            var current = shapeSegments[startIndex];
+
+            do {
+
+                var currentPoints = new Line2DSegment (
+                    shape[current.one],
+                    shape[current.two]
+                );
+
+                if (IsLineSegmentIntersectingAnother (
+                    segment.tail,
+                    segment.head,
+                    currentPoints.tail,
+                    currentPoints.head,
+                    disallowParallel: false
+                )) {
+
+                    var intersection = GetIntersectionOfLineSegments (
+                        segment.tail,
+                        segment.head,
+                        currentPoints.tail,
+                        currentPoints.head
+                    );
+                    var diff = pair2f.nan;
+
+                    // Only way this can happen is if the lines are parallel.
+                    if (intersection.isNan) {
+
+                        diff = (currentPoints.tail - segment.tail);
+
+                        // If the given segment's tail is inside the shape's segment...
+                        if (diff.ToDirection () != (currentPoints.head - segment.tail).ToDirection ()) {
+
+                            // Then this segment can't be beat.
+                            result = current;
+                            break;
+
+                        }
+
+                    } else {
+
+                        diff = (intersection - segment.tail);
+
+                    }
+
+                    if (diff.magnitude < distance) {
+
+                        distance = diff.magnitude;
+                        result = current;
+
+                    }
+                }
+
+                current = shapeSegments[current.two];
+
+            } while (current.one != endIndex);
+
+            return result;
+
+        }
+
+        private static List<IntPair> GetLineSegmentIndiciesFromShape (List<pair2f> shape) {
+
+            var indicies = new List<IntPair> ();
+
+            int i;
+            for (i = 1; i < shape.Count; i++) {
+
+                indicies.Add (new IntPair ((i - 1), i));
+
+            }
+            indicies.Add (new IntPair ((i - 1), 0));
+
+            return indicies;
+
+        }

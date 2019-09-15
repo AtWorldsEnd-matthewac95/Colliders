@@ -1,0 +1,337 @@
+﻿        public static List<pair2f> GetConvexHull_LinkedList (ReadOnlyCollection<pair2f> shape) => GetConvexHull_LinkedList (shape, new pair2f (-1f, -1f));
+
+        public static List<pair2f> GetConvexHull_LinkedList (ReadOnlyCollection<pair2f> shape, pair2f normal) {
+
+            var hull = new LinkedList<pair2f> ();
+
+            if (shape.Count >= MINIMUM_VERTEX_COUNT) {
+
+                var list = SFloatMath.RemoveFromLinkedListByDotProduct (
+                    shape,
+                    normal,
+                    out var point1,
+                    out var point2
+                );
+
+                var tail = hull.AddToEnd (point1);
+                var head = hull.AddToEnd (point2);
+                normal = GetNormalComponents (point1, point2);
+
+                point1 = SFloatMath.RemoveFromLinkedListByDotProduct (
+                    list,
+                    normal,
+                    out point1
+                );
+
+                hull.AddAsNext (point1, tail);
+                hull.AddToEnd (point2);
+
+                list.RemoveByCondition (point => IsPointInConvexShape (point, hull));
+
+                var current = hull.head;
+                var positives = new List<LinkedListNode<pair2f>> ();
+                (float distance, pair2f point) furthest;
+
+                while ((list.head != null) && (current != null)) {
+
+                    positives.Clear ();
+
+                    furthest.distance = Single.NegativeInfinity;
+                    furthest.point = pair2f.nan;
+
+                    normal = GetNormalComponents (
+                        current.value,
+                        current.GetNextOrHead ().value
+                    );
+
+                    var origin = current.value;
+                    var listNode = list.head;
+                    var dot = SFloatMath.GetDotProduct (
+                        (listNode.value - origin),
+                        normal
+                    );
+
+                    if (dot > 0f) {
+
+                        positives.Add (null);
+                        furthest.distance = dot;
+                        furthest.point = listNode.value;
+
+                    }
+
+                    while (listNode.next != null) {
+
+                        dot = SFloatMath.GetDotProduct (
+                            (listNode.next.value - origin),
+                            normal
+                        );
+
+                        if (dot > 0f) {
+
+                            positives.Add (listNode);
+
+                            if (dot > furthest.distance) {
+
+                                furthest.distance = dot;
+                                furthest.point = listNode.next.value;
+
+                            }
+                        }
+
+                        listNode = listNode.next;
+
+                    }
+
+                    if (furthest.distance > SFloatMath.MINIMUM_DIFFERENCE) {
+
+                        hull.AddAsNext (furthest.point, current);
+
+                        list.RemoveByCondition (
+                            (point => IsPointInConvexShape (point, hull)),
+                            positives.AsReadOnly ()
+                        );
+
+                    } else {
+
+                        current = current.next;
+
+                    }
+                }
+            }
+
+            return hull.AsList ();
+
+        }
+
+        public static List<pair2f> GetConvexHull (IEnumerable<pair2f> shape) => GetConvexHull (shape, new pair2f (0f, 1f));
+
+        public static List<pair2f> GetConvexHull (IEnumerable<pair2f> shape, pair2f normal) => GetConvexHull (shape, normal, out _);
+
+        public static List<pair2f> GetConvexHull (IEnumerable<pair2f> shape, out pair2f center) => GetConvexHull (shape, new pair2f (0f, 1f), out center);
+
+        public static List<pair2f> GetConvexHull (
+            IEnumerable<pair2f> shape,
+            pair2f normal,
+            out pair2f center
+        ) {
+
+            var hull = new List<pair2f> ();
+            center = pair2f.origin;
+
+            var current = new List<pair2f> (shape);
+            var furthest = (index: -1, value: Single.NaN);
+            var origin = pair2f.origin;
+            var insertionIndex = 0;
+            var prevHullCount = 0;
+
+            while ((current.Count > 0) && (insertionIndex <= hull.Count)) {
+
+                for (int i = 0; i < current.Count; i++) {
+
+                    var currentDiff = (current[i] - origin);
+                    var dot = SFloatMath.GetDotProduct (currentDiff, normal);
+
+                    // TODO - Improve these two if statements, surely there has to be a cleaner way of doing this.
+                    if (((dot + SFloatMath.MINIMUM_DIFFERENCE) > furthest.value) || Single.IsNaN (furthest.value)) {
+
+                        if ((dot > furthest.value) || Single.IsNaN (furthest.value) || (furthest.index < 0)) {
+
+                            furthest.value = dot;
+                            furthest.index = i;
+
+                        } else {
+
+                            /*
+                             This index has an equivalent dot product to the current furthest node.
+                             In order to resolve this, see if one of them is further in the direction
+                             perpendicularly clockwise to the normal vector.
+                             */
+
+                            var clockwiseNormal = GetNormalComponents (
+                                -normal,
+                                normal
+                            );
+                            var dotf = SFloatMath.GetDotProduct (
+                                (current[furthest.index] - origin),
+                                clockwiseNormal
+                            );
+                            var dotc = SFloatMath.GetDotProduct (
+                                currentDiff,
+                                clockwiseNormal
+                            );
+
+                            if (dotc > dotf) {
+
+                                // No need to change furthest.value because it's the same.
+                                furthest.index = i;
+
+                            }
+                        }
+                    }
+                }
+
+                if (furthest.index > -1) {
+
+                    hull.Insert (insertionIndex, current[furthest.index]);
+                    center += current[furthest.index];
+                    current.RemoveAt (furthest.index);
+
+                } else {
+
+                    insertionIndex++;
+
+                }
+
+                if (prevHullCount != hull.Count) {
+
+                    if (hull.Count >= MINIMUM_VERTEX_COUNT) {
+
+                        current = RemoveConvexShapeFromList (hull, current);
+
+                    }
+
+                    prevHullCount = hull.Count;
+
+                }
+
+                if (hull.Count < 2) {
+
+                    normal *= -1f;
+                    origin = hull[0];
+
+                    insertionIndex = 1;
+
+                } else {
+
+                    // Reminder that this function returns a clockwise vector.
+                    normal = GetNormalComponents (
+                        hull[insertionIndex % hull.Count],
+                        hull[insertionIndex - 1]
+                    );
+                    origin = hull[insertionIndex - 1];
+
+                }
+
+                furthest.index = -1;
+                furthest.value = 0f;
+
+            }
+
+            if (hull.Count >= MINIMUM_VERTEX_COUNT) {
+
+                center /= hull.Count;
+
+            } else {
+
+                hull = null;
+                center = pair2f.nan;
+
+            }
+
+            return hull;
+
+        }
+
+        private static List<pair2f> RemoveConvexShapeFromList (
+            List<pair2f> shape,
+            List<pair2f> list,
+            bool removeFromBoundary = true,
+            float tolerance = MINIMUM_ORIENTATION
+        ) {
+
+            for (int i = (list.Count - 1); i >= 0; i--) {
+
+                if (IsPointInConvexShape (
+                    list[i],
+                    shape.AsReadOnly (),
+                    removeFromBoundary,
+                    tolerance
+                )) {
+
+                    list.RemoveAt (i);
+
+                }
+            }
+
+            return list;
+
+        }
+
+        public static List<pair2f> GetConvexHull_Graham (ReadOnlyCollection<pair2f> input) {
+
+            List<pair2f> hull = null;
+
+            if (input.Count >= MINIMUM_VERTEX_COUNT) {
+
+                hull = new List<pair2f> ();
+                var shape = new pair2f[input.Count];
+                shape[0] = input[0];
+                var origin = input[0];
+
+                for (int i = 1; i < shape.Length; i++) {
+
+                    var point = input[i];
+
+                    if (point.y <= origin.y) {
+
+                        if ((point.y < origin.y) || (point.x < origin.x)) {
+
+                            origin = point;
+
+                        }
+                    }
+
+                    shape[i] = point;
+
+                }
+
+                /*
+                 Because SFloatMath.Cosine returns 1f when (0f, 0f) is passed to it,
+                 and because Array.Sort automatically sorts elements in ascending order,
+                 this operation will result in origin being the sorted array's last
+                 element. We can use this fact to ignore the last element later on.
+                 */
+                Array.Sort (
+                    shape,
+                    // This function implements the Graham algorithm for finding a convex hull.
+                    // If you understand how that algorithm works this sort should make a lot more sense.
+                    (p1, p2) => SFloatMath.Cosine (p1 - origin).CompareTo (
+                        SFloatMath.Cosine (p2 - origin)
+                    )
+                );
+
+                // First we put the origin into the hull.
+                hull.Push (origin);
+                hull.Push (shape[0]);
+
+                                    // Here is where we ignore the last element because we know it's the origin.
+                for (int i = 1; i < (shape.Length - 1); i++) {
+
+                    /*
+                     Now we pop the top of the stack and use Peek and the next array element to determine
+                     if we should keep or discard the popped item.
+                     We only keep the popped item if the orientation of the aformentioned three points is
+                     a clockwise turn (since we want to end up with a clockwise shape).
+                     */
+                    var end = shape[i];
+
+                    var mid = hull.Pop ();
+
+                    while (
+                        (hull.Count > 0)
+                        && (GetOrientation (hull.Peek (), mid, end, isUsingMinimumValue: true) != ORIENT_CLOCK)
+                    ) {
+
+                        mid = hull.Pop ();
+
+                    }
+
+                    hull.Push (mid);
+                    hull.Push (end);
+
+                }
+            }
+
+            return hull;
+
+        }

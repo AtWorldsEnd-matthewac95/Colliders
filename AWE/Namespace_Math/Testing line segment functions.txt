@@ -1,0 +1,550 @@
+==============================================================================================
+==                                          Code                                            ==
+==============================================================================================
+
+
+using System;
+
+public struct pair2f : IEquatable<pair2f> {
+
+	public static readonly pair2f origin;
+	public static readonly pair2f nan;
+
+	static pair2f () {
+
+		origin = new pair2f ();
+		nan = new pair2f () {
+			x = float.NaN,
+			y = float.NaN
+		};
+
+	}
+
+	public static bool operator == (pair2f p, pair2f q) {
+
+		return p.Equals (q);
+
+	}
+
+	public static bool operator != (pair2f p, pair2f q) {
+
+		return !p.Equals (q);
+
+	}
+
+	public static pair2f operator + (pair2f p, pair2f q) {
+
+		return new pair2f ((p.x + q.x), (p.y + q.y));
+
+	}
+
+	public static pair2f operator - (pair2f p, pair2f q) {
+
+		return new pair2f ((p.x - q.x), (p.y - q.y));
+
+	}
+
+	public static pair2f operator * (pair2f p, float f) {
+
+		return new pair2f ((p.x * f), (p.y * f));
+
+	}
+
+	public static pair2f operator / (pair2f p, float f) {
+
+		return new pair2f ((p.x / f), (p.y / f));
+
+	}
+
+	public static pair2f operator - (pair2f p) {
+
+		return new pair2f (-p.x, -p.y);
+
+	}
+
+	public float x { get; private set; }
+	public float y { get; private set; }
+
+	public float this [int index] {
+
+		get {
+
+			float value;
+
+			if (index == 0) {
+
+				value = x;
+
+			} else if (index == 1) {
+
+				value = y;
+
+			} else {
+
+				throw new IndexOutOfRangeException ();
+
+			}
+
+			return value;
+
+		}
+	}
+
+	public pair2f (float x, float y) : this () {
+
+		this.x = x;
+		this.y = y;
+
+	}
+
+	public override bool Equals (object other) {
+
+		var isEqual = false;
+
+		if (other is pair2f) {
+
+			var otherPair = (pair2f)other;
+			isEqual = this.Equals (otherPair);
+
+		}
+
+		return isEqual;
+
+	}
+
+	public override int GetHashCode () {
+
+		int basePrime = 61;
+		int multPrime = 229;
+
+		unchecked {
+
+			var hashCode = basePrime;
+			hashCode = ((hashCode * multPrime) ^ this.x.GetHashCode ());
+			hashCode = ((hashCode * multPrime) ^ this.y.GetHashCode ());
+
+			return hashCode;
+
+		}
+	}
+
+	public bool Equals (pair2f other) {
+
+		float xdiff = (this.x - other.x);
+		float ydiff = (this.y - other.y);
+
+		return (SFloatMath.IsFloatNegligible (xdiff) && SFloatMath.IsFloatNegligible (ydiff));
+
+	}
+	
+	public override string ToString () {
+	
+		return ("(" + x.ToString() + ", " + y.ToString () + ")");
+		
+	}
+}
+
+
+public static class SFloatMath {
+	
+	public static pair2f? GetIntersectionOfLineSegments (
+		pair2f line1point1,
+		pair2f line1point2,
+		pair2f line2point1,
+		pair2f line2point2
+	) {
+
+		pair2f? intersection = null;
+
+		var slope1 = (line1point1 - line1point2);
+		var slope2 = (line2point1 - line2point2);
+		float x1diff = (line1point1.x - line2point1.x);
+		float y1diff = (line1point1.y - line2point1.y);
+
+		float denominator = ((slope1.x * slope2.y) - (slope1.y * slope2.x));
+		float interpolation1 = (((slope2.y * x1diff) - (slope2.x * y1diff)) / denominator);
+		
+		var log = String.Format ("Denominator: {0}, Interpolation 1: {1}", denominator, interpolation1);
+
+		if ((interpolation1 >= 0f) && (interpolation1 <= 1f)) {
+
+			float interpolation2 = (((slope1.y * x1diff) - (slope1.x * y1diff)) / denominator);
+
+			log += String.Format (", Interpolation 2: {0}", interpolation2);
+			
+			if ((interpolation2 >= 0f) && (interpolation2 <= 1f)) {
+
+				intersection = (
+					line1point1 + ((
+							line1point2
+							- line1point1
+						) * interpolation1
+					)
+				);
+
+			}	
+		}
+		
+		Console.WriteLine (log + "\n");
+
+		return intersection;
+
+	}
+	
+	public static pair2f? GetIntersectionOfLineSegments (
+		Line2DSegment line1,
+		Line2DSegment line2
+	) {
+	
+		return GetIntersectionOfLineSegments (line1.a, line1.b, line2.a, line2.b);
+		
+	}
+	
+	public static bool IsLineSegmentIntersectingAnother (
+		Line2DSegment line1,
+		Line2DSegment line2,
+		bool isIntersectionLenient = false,
+		float tolerance = 0.01f,
+		bool disallowParallel = true
+	) {
+	
+		return IsLineSegmentIntersectingAnother (line1.a, line1.b, line2.a, line2.b, isIntersectionLenient, tolerance, disallowParallel);
+		
+	}
+	
+	public static bool IsLineSegmentIntersectingAnother (
+		pair2f line1point1,
+		pair2f line1point2,
+		pair2f line2point1,
+		pair2f line2point2,
+		bool isIntersectionLenient = false,
+		float tolerance = 0.01f,
+		bool disallowParallel = true
+	) {
+
+		var isIntersecting = false;
+
+		int orientation1a = GetOrientation (
+			line2point1,
+			line1point1,
+			line1point2,
+			isIntersectionLenient,
+			tolerance
+		);
+		
+		var log = String.Format ("\nOrientation 1A: {0}", orientation1a);
+
+		isIntersecting = (orientation1a == 0);
+
+		if (!isIntersecting || disallowParallel) {
+
+			int orientation1b = GetOrientation (
+				line2point2,
+				line1point1,
+				line1point2,
+				isIntersectionLenient,
+				tolerance
+			);
+			
+			log += String.Format (", Orientation 1B: {0}", orientation1b);
+
+			if (orientation1a != orientation1b) {
+
+				int orientation2a = GetOrientation (
+					line1point1,
+					line2point1,
+					line2point2,
+					isIntersectionLenient,
+					tolerance
+				);
+
+				log += String.Format (", Orientation 2A: {0}", orientation2a);
+
+				isIntersecting = (orientation2a == 0);
+
+				if (!isIntersecting) {
+
+					int orientation2b = GetOrientation (
+						line1point2,
+						line2point1,
+						line2point2,
+						isIntersectionLenient,
+						tolerance
+					);
+
+					log += String.Format (", Orientation 2B: {0}", orientation2b);
+
+					isIntersecting = (orientation2a != orientation2b);
+
+				}
+				
+			} else if (disallowParallel) {
+				
+				isIntersecting = false;
+				
+			}
+		}
+		
+		Console.WriteLine (log);
+
+		return isIntersecting;
+
+	}
+
+	public static float GetOrientation (pair2f start, pair2f mid, pair2f end) {
+
+		var endSlope = (end - mid);
+		var startSlope = (mid - start);
+
+		return GetDeterminant (endSlope, startSlope);
+
+	}
+
+	public static int GetOrientation (
+		pair2f start,
+		pair2f mid,
+		pair2f end,
+		bool isUsingMinimumValue,
+		float minimumAbsoluteValue = 0.01f
+	) {
+
+		return GetSign (
+			GetOrientation (start, mid, end),
+			isUsingMinimumValue,
+			minimumAbsoluteValue
+		);
+
+	}
+
+	public static int GetSign (
+		float value,
+		bool isUsingMinimumValue = false,
+		float minimumAbsoluteValue = 0.00001f
+	) {
+
+		int sign;
+
+		if (isUsingMinimumValue) {
+
+			if (IsFloatNegligible (value, minimumAbsoluteValue)) {
+
+				sign = 0;
+
+			} else if (value > 0f) {
+
+				sign = 1;
+
+			} else {
+
+				sign = -1;
+
+			}
+
+		} else {
+
+			if (value > 0f) {
+
+				sign = 1;
+
+			} else if (value < 0f) {
+
+				sign = -1;
+
+			} else {
+
+				sign = 0;
+
+			}
+		}
+
+		return sign;
+
+	}
+
+	public static bool IsFloatNegligible (
+		float value,
+		float minimumAbsoluteValue = 0.00001f
+	) {
+
+		float abs = Math.Abs (value);
+		return (abs < minimumAbsoluteValue);
+
+	}
+
+	public static float GetDeterminant (pair2f p, pair2f q) {
+
+		return (
+			(p.x * q.y)
+			- (q.x * p.y)
+		);
+
+	}
+}
+
+public class Line2DSegment {
+
+	public pair2f a { get; private set; }
+	public pair2f b { get; private set; }
+	
+	public Line2DSegment (pair2f a, pair2f b) {
+	
+		this.a = a;
+		this.b = b;
+		
+	}
+}
+
+public static class Program {
+
+	public static void Main () {
+	
+		var segment1 = new Line2DSegment (pair2f.origin, pair2f.origin);
+		var segment2 = new Line2DSegment (pair2f.origin, new pair2f (1f, 1f));
+		var segment3 = new Line2DSegment (new pair2f (0f, 1f), new pair2f (1f, 0f));
+		var segment4 = new Line2DSegment (new pair2f (2f, 6f), new pair2f (-0.1f, -2f));
+		var segment5 = new Line2DSegment (new pair2f (-7f, 0f), new pair2f (8f, -1f));
+		var segment6 = new Line2DSegment (new pair2f (-10f, 10f), new pair2f (10f, 10f));
+		var segment7 = new Line2DSegment (new pair2f (1f, 1f), new pair2f (0f, 2f));
+		var segment8 = new Line2DSegment (new pair2f (-4f, 1f), new pair2f (0.5f, 0.5f));
+		var segment9 = new Line2DSegment (new pair2f (1f, 1f), new pair2f (2f, 2f));
+		var segmentA = new Line2DSegment (new pair2f (0.5f, 0.5f), new pair2f (3f, 3f));
+		
+		var isIntersecting = SFloatMath.IsLineSegmentIntersectingAnother (segment1, segment1);
+		var intersection = SFloatMath.GetIntersectionOfLineSegments (segment1, segment1);
+		
+		Console.WriteLine (isIntersecting + ": " + (intersection.HasValue ? intersection.Value.ToString () : "null"));
+		
+		isIntersecting = SFloatMath.IsLineSegmentIntersectingAnother (segment1, segment2);
+		intersection = SFloatMath.GetIntersectionOfLineSegments (segment1, segment2);
+		
+		Console.WriteLine (isIntersecting + ": " + (intersection.HasValue ? intersection.Value.ToString () : "null"));
+		
+		isIntersecting = SFloatMath.IsLineSegmentIntersectingAnother (segment2, segment3);
+		intersection = SFloatMath.GetIntersectionOfLineSegments (segment2, segment3);
+		
+		Console.WriteLine (isIntersecting + ": " + (intersection.HasValue ? intersection.Value.ToString () : "null"));
+		
+		isIntersecting = SFloatMath.IsLineSegmentIntersectingAnother (segment2, segment1);
+		intersection = SFloatMath.GetIntersectionOfLineSegments (segment2, segment1);
+		
+		Console.WriteLine (isIntersecting + ": " + (intersection.HasValue ? intersection.Value.ToString () : "null"));
+		
+		isIntersecting = SFloatMath.IsLineSegmentIntersectingAnother (segment2, segment4);
+		intersection = SFloatMath.GetIntersectionOfLineSegments (segment2, segment4);
+		
+		Console.WriteLine (isIntersecting + ": " + (intersection.HasValue ? intersection.Value.ToString () : "null"));
+		
+		isIntersecting = SFloatMath.IsLineSegmentIntersectingAnother (segment4, segment3);
+		intersection = SFloatMath.GetIntersectionOfLineSegments (segment4, segment3);
+		
+		Console.WriteLine (isIntersecting + ": " + (intersection.HasValue ? intersection.Value.ToString () : "null"));
+		
+		isIntersecting = SFloatMath.IsLineSegmentIntersectingAnother (segment4, segment5);
+		intersection = SFloatMath.GetIntersectionOfLineSegments (segment4, segment5);
+		
+		Console.WriteLine (isIntersecting + ": " + (intersection.HasValue ? intersection.Value.ToString () : "null"));
+		
+		isIntersecting = SFloatMath.IsLineSegmentIntersectingAnother (segment6, segment5);
+		intersection = SFloatMath.GetIntersectionOfLineSegments (segment6, segment5);
+		
+		Console.WriteLine (isIntersecting + ": " + (intersection.HasValue ? intersection.Value.ToString () : "null"));
+		
+		isIntersecting = SFloatMath.IsLineSegmentIntersectingAnother (segment1, segment1);
+		intersection = SFloatMath.GetIntersectionOfLineSegments (segment1, segment1);
+		
+		Console.WriteLine (isIntersecting + ": " + (intersection.HasValue ? intersection.Value.ToString () : "null"));
+		
+		isIntersecting = SFloatMath.IsLineSegmentIntersectingAnother (segment2, segment7);
+		intersection = SFloatMath.GetIntersectionOfLineSegments (segment2, segment7);
+		
+		Console.WriteLine (isIntersecting + ": " + (intersection.HasValue ? intersection.Value.ToString () : "null"));
+		
+		isIntersecting = SFloatMath.IsLineSegmentIntersectingAnother (segment2, segment8);
+		intersection = SFloatMath.GetIntersectionOfLineSegments (segment2, segment8);
+		
+		Console.WriteLine (isIntersecting + ": " + (intersection.HasValue ? intersection.Value.ToString () : "null"));
+		
+		isIntersecting = SFloatMath.IsLineSegmentIntersectingAnother (segment2, segment9);
+		intersection = SFloatMath.GetIntersectionOfLineSegments (segment2, segment9);
+		
+		Console.WriteLine (isIntersecting + ": " + (intersection.HasValue ? intersection.Value.ToString () : "null"));
+		
+		isIntersecting = SFloatMath.IsLineSegmentIntersectingAnother (segment2, segmentA);
+		intersection = SFloatMath.GetIntersectionOfLineSegments (segment2, segmentA);
+		
+		Console.WriteLine (isIntersecting + ": " + (intersection.HasValue ? intersection.Value.ToString () : "null"));
+		
+	}
+}
+
+
+
+==============================================================================================
+==                                         Output                                           ==
+==============================================================================================
+
+
+Orientation 1A: 0, Orientation 1B: 0
+Denominator: 0, Interpolation 1: NaN
+
+False: null
+
+Orientation 1A: 0, Orientation 1B: 0
+Denominator: 0, Interpolation 1: NaN
+
+False: null
+
+Orientation 1A: -1, Orientation 1B: 1, Orientation 2A: 1, Orientation 2B: -1
+Denominator: -2, Interpolation 1: 0.5, Interpolation 2: 0.5
+
+True: (0.5, 0.5)
+
+Orientation 1A: 0, Orientation 1B: 0
+Denominator: 0, Interpolation 1: NaN
+
+False: null
+
+Orientation 1A: -1, Orientation 1B: 1, Orientation 2A: 1, Orientation 2B: -1
+Denominator: -5.9, Interpolation 1: 0.5762713, Interpolation 2: 0.6779661
+
+True: (0.5762713, 0.5762713)
+
+Orientation 1A: 1, Orientation 1B: -1, Orientation 2A: -1, Orientation 2B: 1
+Denominator: 10.1, Interpolation 1: 0.6930693, Interpolation 2: 0.5445545
+
+True: (0.5445546, 0.4554458)
+
+Orientation 1A: 1, Orientation 1B: -1, Orientation 2A: -1, Orientation 2B: 1
+Denominator: 122.1, Interpolation 1: 0.8108108, Interpolation 2: 0.4864865
+
+True: (0.2972974, -0.4864864)
+
+Orientation 1A: 1, Orientation 1B: 1
+Denominator: -20, Interpolation 1: -7.35
+
+False: null
+
+Orientation 1A: 0, Orientation 1B: 0
+Denominator: 0, Interpolation 1: NaN
+
+False: null
+
+Orientation 1A: 0, Orientation 1B: -1, Orientation 2A: -1, Orientation 2B: 0
+Denominator: 2, Interpolation 1: 1, Interpolation 2: 0
+
+True: (1, 1)
+
+Orientation 1A: -1, Orientation 1B: 0, Orientation 2A: 1, Orientation 2B: -1
+Denominator: -5, Interpolation 1: 0.5, Interpolation 2: 1
+
+True: (0.5, 0.5)
+
+Orientation 1A: 0, Orientation 1B: 0
+Denominator: 0, Interpolation 1: NaN
+
+False: null
+
+Orientation 1A: 0, Orientation 1B: 0
+Denominator: 0, Interpolation 1: NaN
+
+False: null

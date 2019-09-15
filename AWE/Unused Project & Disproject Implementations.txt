@@ -1,0 +1,92 @@
+
+    Below is my first attempt at implementing DirectionGradient.Project and Disproject
+    This was before I realized a matrix was more efficient.
+
+
+
+        public EDirection Project (EDirection direction) {
+
+            var projected = EDirection.None;
+
+            int myInt = (int)this.value;
+            int givenInt = (int)direction;
+            int diff = Math.Abs (myInt - givenInt);
+
+            if (diff != DIRECTION_HALFCOUNT) {
+
+                int sum = (myInt + givenInt);
+
+                if (diff > DIRECTION_HALFCOUNT) {
+
+                    sum += DIRECTION_COUNT;
+
+                }
+
+                if ((sum % 2) == 0) {
+
+                    projected = (EDirection)(sum / 2);
+
+                } else if (((sum - 1) % 4) == 0) {
+
+                    projected = (EDirection)((sum - 1) / 2);
+
+                } else {
+
+                    projected = (EDirection)((sum + 1) / 2);
+
+                }
+            }
+
+            return projected;
+
+        }
+
+        public EDirection Disproject (EDirection direction) {
+
+            var disprojected = EDirection.None;
+
+            int myInt = (int)this.value;
+            int givenInt = (int)direction;
+            int diff = (myInt - givenInt);
+
+            if (diff != 0) {
+
+                if (diff > DIRECTION_HALFCOUNT) {
+
+                    diff -= DIRECTION_COUNT;
+
+                } else if (diff < -DIRECTION_HALFCOUNT) {
+
+                    diff += DIRECTION_COUNT;
+
+                }
+
+                if (myInt.IsOdd ()) {
+
+                    if (Math.Abs (diff) > 1) {
+
+                        disprojected = this.value;
+
+                    }
+
+                } else {
+
+                    if (Math.Abs (diff) > (DIRECTION_HALFCOUNT / 2)) {
+
+                        disprojected = this.value;
+
+                    } else if (diff > 0) {
+
+                        disprojected = (EDirection)(myInt + 1);
+
+                    } else {
+
+                        disprojected = (EDirection)(myInt - 1);
+
+                    }
+                }
+            }
+
+            return disprojected;
+
+        }

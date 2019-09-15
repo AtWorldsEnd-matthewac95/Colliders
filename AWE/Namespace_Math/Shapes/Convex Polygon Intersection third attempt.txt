@@ -1,0 +1,292 @@
+﻿
+        public ConvexPolygon2D FindOverlap (ConvexPolygon2D other, bool qualifyImmediately = false) {
+
+            var overlap = new List<pair2f> ();
+            var intersections = new Queue<pair2f> ();
+            var vertexIndicies = new Queue<IntPair> ();
+
+            int next, index = 0, otherIndex = 0;
+            do {
+
+                next = this.GetNextIndex (index);
+                var current = this[index, next];
+
+                /*
+                 * Reminder that indicies will be one of two types of values...
+                 *
+                 * 1) If the intersection was not parallel...
+                 *     a) pair.one == the index of the other polygon's FIRST segment that intersected.
+                 *     b) pair.two == the index of the other polygon's SECOND segment that intersected.
+                 *
+                 * 2) If the intersection WAS parallel...
+                 *     a) pair.one == the index of the other polygon's segment that intersected.
+                 *     b) pair.two == which shape ended the parallel intersection.
+                 *         EOperationContext.Target means the other shape ended it.
+                 *         EOperationContext.Source means this shape ended it.
+                 */
+
+                var (intersection1, intersection2) = other.FindSegmentIntersections (
+                    current,
+                    out var indicies,
+                    out bool isParallel,
+                    start: otherIndex
+                );
+
+                if (!intersection1.isNan) {
+
+                    /* 
+                     * In this loop, the IntPairs enqueues into vertexIndicies are indicators of where to search for
+                     * polygon verticies that are directly inside the overlap.
+                     *
+                     * pair.one is the index you should look in THIS shape.
+                     * pair.two is the index you should look in the OTHER shape.
+                     */
+
+                    otherIndex = indicies.a;
+
+                    if (intersection1 != current.tail) {
+
+                        intersections.Enqueue (intersection1);
+                        vertexIndicies.Enqueue (new IntPair (next, other.GetNextIndex (otherIndex)));
+
+                    }
+
+                    if (!intersection2.isNan) {
+
+                        intersections.Enqueue (intersection2);
+
+                        /*
+                         * The reason we insert -1 into the vertexIndicies pair is because one of the segments might have
+                         * intersected a shape twice. In that case, we only need to look in the twice-intersected shape
+                         * for verticies, since in order for a segment to intersect a shape twice it necessarily must not
+                         * have an endpoint inside the overlap.
+                         */
+
+                        vertexIndicies.Enqueue (
+                            (isParallel && (indicies.b == (int)EOperationContext.Source))
+                            ? new IntPair (this.GetNextIndex (next), -1)
+                            : new IntPair (-1, other.GetNextIndex (
+                                isParallel
+                                ? other.GetNextIndex (otherIndex)
+                                : indicies.b
+                            ))
+                        );
+
+                    }
+                }
+
+                index = next;
+
+            } while (index != 0);
+
+            if (intersections.Count > 0) {
+
+                var firstIndicies = vertexIndicies.Peek ();
+
+                while (intersections.Count > 0) {
+
+                    var intersection = intersections.Dequeue ();
+                    overlap.Add (intersection);
+
+                    var indicies = vertexIndicies.Dequeue ();
+                    var notSkipped = true;
+
+                    if (!this.AddRangeOfPointsToList (
+                        overlap,
+                        indicies.a,
+                        (
+                            vertexIndicies.Count > 0
+                            ? vertexIndicies.Peek ().a
+                            : firstIndicies.a
+                        ),
+                        SkipCondition: p => {
+
+                            notSkipped &= (p == intersection);
+                            return notSkipped;
+
+                        },
+                        StartCondition: p => other.IsContainingPoint (p, false)
+                    )) {
+
+                        notSkipped = true;
+
+                        other.AddRangeOfPointsToList (
+                            overlap,
+                            indicies.b,
+                            (
+                                vertexIndicies.Count > 0
+                                ? vertexIndicies.Peek ().b
+                                : firstIndicies.b
+                            ),
+                            SkipCondition: p => {
+
+                                notSkipped &= (p == intersection);
+                                return notSkipped;
+
+                            },
+                            StartCondition: p => this.IsContainingPoint (p, false)
+                        );
+
+                    }
+                }
+
+            } else if (this.IsContainingPoint (other[0])) {
+
+                overlap = new List<pair2f> (other._verticies);
+
+            } else if (other.IsContainingPoint (this[0])) {
+
+                overlap = new List<pair2f> (this._verticies);
+
+            }
+
+            ConvexPolygon2D polygon = null;
+
+            if (overlap.Count >= SShapeMath.MINIMUM_VERTEX_COUNT) {
+
+                polygon = new ConvexPolygon2D {
+                    _verticies = overlap,
+                    _isConvex = true
+                };
+
+                if (qualifyImmediately) {
+
+                    polygon.PopulateBoundsAndCenter (overlap.AsReadOnly ());
+
+                }
+            }
+
+            return polygon;
+
+        }
+
+        public Pair<pair2f> FindSegmentIntersections (
+            Line2DSegment segment,
+            out IntPair indicies,
+            out bool isParallel,
+            int start = 0,
+            int end = -1,
+            bool returnOnFirst = false
+        ) {
+
+            var intersection1 = pair2f.nan;
+            var intersection2 = pair2f.nan;
+            indicies = new IntPair (-1, -1);
+
+            // This value normally would be set below, but we assume false here to make sure isParallel is written to at least once.
+            isParallel = false;
+
+            if (end < 0) {
+
+                end = start;
+
+            }
+
+            int index = start;
+            var distance = Single.PositiveInfinity;
+            var skipNextIntersection = false;
+
+            do {
+
+                var next = this.GetNextIndex (index);
+                var current = this [index, next];
+
+                if (segment.IsIntersecting (current, disallowParallel: false)) {
+
+                    if (indicies.a < 0) {
+
+                        indicies = new IntPair (index, -1);
+                        intersection1 = segment.FindIntersection (current);
+                        isParallel = intersection1.isNan;
+
+                        // If the intersection is parallel...
+                        if (isParallel) {
+
+                            // Resolve it, then indicate where the parallel intersection ended.
+                            (intersection1, intersection2) = current.FindParallelIntersections (segment, out var enders);
+                            indicies = new IntPair (indicies.a, (int)enders.second);
+
+                            // Parallel intersection means there are no other intersections.
+                            break;
+
+                        }
+
+                        if (returnOnFirst) {
+
+                            break;
+
+                        } else {
+
+                            // If the segment intersected on a vertex and is not parallel...
+                            if (intersection1 == current.head) {
+
+                                // Then skip the next intersection, because it will intersect on the same vertex.
+                                skipNextIntersection = true;
+
+                            } else if ((start == end) && (intersection1 == current.tail)) {
+
+                                // If the intersection is on current's tail, then this must be the first segment on the polygon.
+                                // Skip the last segment on the polygon for the same reason as above.
+                                end = this.GetPreviousIndex (end);
+
+                            }
+
+                            distance = (intersection1 - segment.tail).magnitude;
+
+                        }
+
+                    } else {
+
+                        var intersection = segment.FindIntersection (current);
+                        isParallel = intersection.isNan;
+
+                        if (isParallel) {
+
+                            /*
+                             * This must be a parallel intersection.
+                             *
+                             * We can discard the first element returned here because
+                             * it must have already been found as current.head last iteration.
+                             */
+
+                            (_, intersection2) = current.FindParallelIntersections (segment, out var enders);
+                            indicies = new IntPair (indicies.a, (int)enders.second);
+
+                            break;
+
+                        } else {
+
+                            if (skipNextIntersection) {
+
+                                // We've skipped the next intersection. Reset the flag so it doesn't happen again.
+                                skipNextIntersection = false;
+
+                            } else {
+
+                                if ((intersection - segment.tail).magnitude < distance) {
+
+                                    intersection2 = intersection1;
+                                    intersection1 = intersection;
+                                    indicies = new IntPair (index, indicies.a);
+
+                                } else {
+
+                                    intersection2 = intersection;
+                                    indicies = new IntPair (indicies.a, index);
+
+                                }
+
+                                break;
+
+                            }
+                        }
+                    }
+                }
+
+                index = next;
+
+            } while (index != end);
+
+            return new Pair<pair2f> (intersection1, intersection2);
+
+        }

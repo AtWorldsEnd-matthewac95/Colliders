@@ -1,0 +1,130 @@
+
+        public ConvexPolygon2D FindOverlap (ConvexPolygon2D other, bool qualifyOverlapImmediately = false) {
+
+            const int THIS = 0,
+                      OTHER = 1;
+
+            int SwapTarget (int tar) {
+                if (tar == THIS) return OTHER;
+                if (tar == OTHER) return THIS;
+                return -1;
+            }
+
+            IntPair ProgressIndicies (int poly, IntPair inds, int next) {
+                if (poly == THIS) return new IntPair (next, inds.two);
+                if (poly == OTHER) return new IntPair (inds.one, next);
+                return new IntPair (-1, -1);
+            }
+
+            var overlap = new List<pair2f> ();
+
+            var vertexSuccess = true;
+            var addFirstIntersection = false;
+            var polygons = new Pair<ConvexPolygon2D> (this, other);
+            var stops = new IntPair (0, -1);
+            var indicies = new IntPair (0, 0);
+            var target = THIS;
+            var current = new IntPair (target, indicies[target]);
+
+            do {
+
+                var polygon = polygons[current.one];
+                var opposite = polygon.opposite (current.one);
+                var segment = polygon.GetSegment (current.two);
+
+                if (vertexSuccess) {
+
+                    if (opposite.IsContainingPoint (segment.tail)) {
+
+                        overlap.Add (segment.tail);
+
+                    } else {
+
+                        vertexSuccess = false;
+
+                    }
+                }
+
+                var (intersection1, intersection2) = opposite.FindSegmentIntersections (
+                    segment,
+                    out IntPair positions,
+                    out bool isParallel,
+                    returnOnFirst: vertexSuccess
+                );
+
+                if (!intersection1.isNan) {
+
+                    // If we haven't set Other's stop index yet, do so now.
+                    if ((stops.two == -1) && (current.one == THIS)) {
+
+                        stops = new IntPair (stops.one, positions.one);
+
+                    }
+
+                    // Don't add the first intersection if we already added it using IsContainingPoint, or if we're skipping it.
+                    if (addFirstIntersection &&
+                        !(vertexSuccess && (intersection1 == segment.tail))
+                    ) {
+
+                        overlap.Add (intersection1);
+
+                    }
+
+                    // Always reset this flag.
+                    addFirstIntersection = true;
+
+                    if (isParallel) {
+
+                        // In either case, add the second intersection...
+                        overlap.Add (intersection2);
+
+                        // ...and make sure we don't add it again.
+                        vertexSuccess = false;
+
+                        /*
+                         When parallel, positions.two indicates which source (the polygon or the given line segment) ended the intersection.
+                         PARALLEL_THIS means the polygon (in this case opposite) ended it, otherwise it's the segment (in this case from current).
+
+                         If opposite ended the intersection, we should be looking there for our next vertex.
+                         */
+                        if (positions.two == Line2DSegment.PARALLEL_THIS) {
+
+                            target = SwapTarget (target);
+
+                        }
+
+                    } else {
+
+                        if (vertexSuccess) {
+
+                            /*
+                             If we were just in the overlap (vertexSuccess == true), there can't be two intersections so we don't even worry about it.
+                             That means we don't even look at intersection2, and we always swap our target.
+                            */
+                            target = SwapTarget (target);
+
+                        } else if (intersection2.isNan) {
+
+                            // If there is no second intersection and we weren't in the overlap, keep using this target.
+
+                        } else if (intersection2 == segment.head) {
+
+                            // If the second intersection is directly on the segment's head, only swap the target if the
+
+                        }
+
+                    }
+
+                }
+
+                current = new IntPair (target, indicies[target]);
+
+            } while (current.two != stops[current.one]);
+
+            return (
+                (overlap.Count < SShapeMath.MINIMUM_VERTEX_COUNT)
+                ? null
+                : new ConvexPolygon2D (ref overlap, qualifyOverlapImmediately)
+            );
+
+        }

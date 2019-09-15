@@ -1,0 +1,86 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE Moving 2D Tests\\AWE Moving 2D Tests.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE Moving 2D Tests\\AWE Moving 2D Tests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE Moving 2D Tests\\AWE Moving 2D Tests.csproj",
+        "projectName": "AWE Moving 2D Tests",
+        "projectPath": "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE Moving 2D Tests\\AWE Moving 2D Tests.csproj",
+        "packagesPath": "C:\\Users\\Matthew\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE Moving 2D Tests\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Matthew\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp2.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp2.1": {
+            "projectReferences": {
+              "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE\\AWE Moving 2D.csproj": {
+                "projectPath": "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE\\AWE Moving 2D.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp2.1": {
+          "dependencies": {
+            "Microsoft.NET.Test.Sdk": {
+              "target": "Package",
+              "version": "[15.9.0, )"
+            },
+            "Microsoft.NETCore.App": {
+              "target": "Package",
+              "version": "[2.1.0, )",
+              "autoReferenced": true
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.4.0, )"
+            },
+            "xunit.runner.visualstudio": {
+              "target": "Package",
+              "version": "[2.4.0, )"
+            }
+          },
+          "imports": [
+            "net461"
+          ],
+          "assetTargetFallback": true,
+          "warn": true
+        }
+      }
+    },
+    "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE\\AWE Moving 2D.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE\\AWE Moving 2D.csproj",
+        "projectName": "AWE Moving 2D",
+        "projectPath": "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE\\AWE Moving 2D.csproj"
+      },
+      "frameworks": {
+        "net461": {}
+      }
+    }
+  }
+}

@@ -1,0 +1,180 @@
+﻿<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{82DC2942-98FC-4398-9A64-C5AF47F35A3D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>ClassLibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>AWE_Moving_2D</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.ValueTuple.4.5.0\lib\portable-net40+sl4+win8+wp8\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AweException.cs" />
+    <Compile Include="AweOrphanedNodeException.cs" />
+    <Compile Include="ComparableKeyValuePair.cs" />
+    <Compile Include="BitLayerMap.cs" />
+    <Compile Include="BooleanNote.cs" />
+    <Compile Include="Cyclic Iterators\ACyclicIndexIterator.cs" />
+    <Compile Include="Cyclic Iterators\CyclicCollectionIterator.cs" />
+    <Compile Include="Cyclic Iterators\CyclicDelegateIterator.cs" />
+    <Compile Include="Cyclic Iterators\ICyclicIndexIterator.cs" />
+    <Compile Include="Cyclic Iterators\ICyclicIterator.cs" />
+    <Compile Include="DFrameEvent.cs" />
+    <Compile Include="DirectionGradient.cs" />
+    <Compile Include="EDirection.cs" />
+    <Compile Include="IFrameEmitter.cs" />
+    <Compile Include="IGradient.cs" />
+    <Compile Include="IntPair.cs" />
+    <Compile Include="IPair.cs" />
+    <Compile Include="LinkedList\LinkedList.cs" />
+    <Compile Include="LinkedList\LinkedListNode.cs" />
+    <Compile Include="LinkedList\LinkedListPosition.cs" />
+    <Compile Include="Namespace_CollectionExtensions\SCollectionExtensions.cs" />
+    <Compile Include="Namespace_IntExtensions.cs\SIntExtensions.cs" />
+    <Compile Include="Namespace_Math\angle.cs" />
+    <Compile Include="Namespace_Math\AweMathException.cs" />
+    <Compile Include="Namespace_Math\Bounds2D.cs" />
+    <Compile Include="Namespace_Math\DConvertPointToFloat.cs" />
+    <Compile Include="Namespace_Math\DPointConditional.cs" />
+    <Compile Include="Namespace_Math\DPointList.cs" />
+    <Compile Include="Namespace_Math\EAngleMode.cs" />
+    <Compile Include="Namespace_Math\EQuadrant.cs" />
+    <Compile Include="Namespace_Math\IBounds2D.cs" />
+    <Compile Include="Namespace_Math\InclusiveFloat.cs" />
+    <Compile Include="Namespace_Math\Namespace_FloatExtensions\SFloatExtensions.cs" />
+    <Compile Include="Namespace_Math\pair2f.cs" />
+    <Compile Include="Namespace_Math\SDirectionMathExtensions.cs" />
+    <Compile Include="Namespace_Math\SEQuadrantExtensions.cs" />
+    <Compile Include="Namespace_Math\SFloatMath\SFloatMath.cs" />
+    <Compile Include="Namespace_Math\SFloatMath\SFloatMath_angle.cs" />
+    <Compile Include="Namespace_Math\SFloatMath\SFloatMath_bezier.cs" />
+    <Compile Include="Namespace_Math\SFloatMath\SFloatMath_determinant.cs" />
+    <Compile Include="Namespace_Math\SFloatMath\SFloatMath_floatExtensions.cs" />
+    <Compile Include="Namespace_Math\SFloatMath\SFloatMath_linkedList.cs" />
+    <Compile Include="Namespace_Math\Shapes\APolygon2D.cs" />
+    <Compile Include="Namespace_Math\Shapes\ConvexPolygon2D.cs" />
+    <Compile Include="Namespace_Math\Shapes\Derived Convex Polygons\BoxShape2D.cs" />
+    <Compile Include="Namespace_Math\Shapes\DShape2DIntersection.cs" />
+    <Compile Include="EOperationContext.cs" />
+    <Compile Include="Namespace_Math\Shapes\IConvexShape2D.cs" />
+    <Compile Include="Namespace_Math\Shapes\ICurve2D.cs" />
+    <Compile Include="Namespace_Math\Shapes\ICurve2DSegment.cs" />
+    <Compile Include="Namespace_Math\Shapes\ILine2DSegment.cs" />
+    <Compile Include="Namespace_Math\Shapes\IPolygon2D.cs" />
+    <Compile Include="Namespace_Math\Shapes\IShape2D.cs" />
+    <Compile Include="Namespace_Math\Shapes\Line2D.cs" />
+    <Compile Include="Namespace_Math\Shapes\Line2DSegment.cs" />
+    <Compile Include="Namespace_Math\Shapes\Polygon2DEdge.cs" />
+    <Compile Include="Namespace_Math\Shapes\Polygon2DIntersection.cs" />
+    <Compile Include="Namespace_Math\Shapes\Polygon2DTemplate\EPolygon2DParameter.cs" />
+    <Compile Include="Namespace_Math\Shapes\Polygon2DTemplate\EPolygon2DType.cs" />
+    <Compile Include="Namespace_Math\Shapes\Polygon2DTemplate\Polygon2DTemplate.cs" />
+    <Compile Include="Namespace_Math\Shapes\Polygon2DTemplate\SEPolygon2DParameterExtensions.cs" />
+    <Compile Include="Namespace_Math\Shapes\Polygon2DTemplate\SEPolygon2DTypeExtensions.cs" />
+    <Compile Include="Namespace_Math\Shapes\Shape2DType.cs" />
+    <Compile Include="Namespace_Math\Shapes\Shape2DTypeCatalog.cs" />
+    <Compile Include="Namespace_Math\Shapes\SShapeMath\SShapeMath.cs" />
+    <Compile Include="Namespace_Math\Shapes\SShapeMath\SShapeMath_convexHull.cs" />
+    <Compile Include="Namespace_Math\Shapes\SShapeMath\SShapeMath_createShapes.cs" />
+    <Compile Include="Namespace_Math\Shapes\SShapeMath\SShapeMath_lineSegment.cs" />
+    <Compile Include="Namespace_Math\Shapes\SShapeMath\SShapeMath_orientation.cs" />
+    <Compile Include="Namespace_Math\Shapes\SShapeMath\SShapeMath_pointInShape.cs" />
+    <Compile Include="Namespace_Math\Vector2D.cs" />
+    <Compile Include="Namespace_Moving\Colliders\AColliderFrame.cs" />
+    <Compile Include="Namespace_Moving\Colliders\CollisionHandler.cs" />
+    <Compile Include="Namespace_Moving\Colliders\ICollider.cs" />
+    <Compile Include="Namespace_Moving\Colliders\ICollisionResponsive.cs" />
+    <Compile Include="Namespace_Moving\MovingBody\EMovementState.cs" />
+    <Compile Include="Namespace_Moving\MovingBody\IEnumerableMovement.cs" />
+    <Compile Include="Namespace_Moving\MovingBody\IFrameMovement.cs" />
+    <Compile Include="Namespace_Moving\MovingBody\IMovement.cs" />
+    <Compile Include="Namespace_Moving\MovingBody\ITimeMovement.cs" />
+    <Compile Include="Namespace_Moving\MovingBody\MovingBody.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\AMovingPolygon2D.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\ATransform2D.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\ATransform2DListener.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\ITransform2DState.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\VTransform2DListener.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\Transformation2D.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\TranslatingBounds2D.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\MovingShapeBounds2D.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\DTransform2DUpdate.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\ITransform2D.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\ITransform2DListener.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\Point2DGradient.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\Transform2DState.cs" />
+    <Compile Include="Namespace_Moving\Transform\ATransform.cs" />
+    <Compile Include="Namespace_Moving\Transform\ATransformation.cs" />
+    <Compile Include="Namespace_Moving\Transform\ATransformState.cs" />
+    <Compile Include="Namespace_Moving\Transform\GenericTransformation.cs" />
+    <Compile Include="Namespace_Moving\Transform\ITransformation.cs" />
+    <Compile Include="Namespace_Unity\Namespace_Moving2d\UnityTransform2D.cs" />
+    <Compile Include="Namespace_Moving\Transform\ITransform.cs" />
+    <Compile Include="Namespace_Moving\Transform\ITransformListener.cs" />
+    <Compile Include="Namespace_Moving\Transform\ITransformState.cs" />
+    <Compile Include="Namespace_Moving\Transform\TransformStateIndex.cs" />
+    <Compile Include="OperationContext.cs" />
+    <Compile Include="Pair.cs" />
+    <Compile Include="SEDirectionExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Namespace_Math\SFloatMath\Another previous convex polygon intersection attempt.txt" />
+    <Content Include="Namespace_Math\SFloatMath\Convex Polygon Intersection first attempt.txt" />
+    <Content Include="Namespace_Math\Shapes\Convex Polygon Intersection second attempt.txt" />
+    <Content Include="Namespace_Math\Shapes\Convex Polygon Intersection third attempt.txt" />
+    <Content Include="Namespace_Math\Shapes\dotnetfiddle convex overlap text dump.txt" />
+    <Content Include="Namespace_Math\Shapes\SShapeMath\GetConvexHull various previous attempts.txt" />
+    <Content Include="Namespace_Math\Testing line segment functions.txt" />
+    <Content Include="Unused Project &amp; Disproject Implementations.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".vs\AWE\v16\.suo" />
+    <None Include=".vs\ProjectSettings.json" />
+    <None Include=".vs\slnx.sqlite" />
+    <None Include=".vs\VSWorkspaceState.json" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include=".vs\AWE Moving 2D\v16\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+</Project>

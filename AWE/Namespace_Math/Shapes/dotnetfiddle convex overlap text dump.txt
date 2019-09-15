@@ -1,0 +1,3528 @@
+using System;
+using System.Text;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+public static class SEDirectionExtensions {
+
+	private static DirectionGradient gradient;
+
+	static SEDirectionExtensions () {
+
+		gradient = new DirectionGradient ();
+
+	}
+
+	public static EDirection horizontal (this EDirection value) {
+
+		gradient.current = value;
+		return gradient.horizontal;
+
+	}
+
+	public static EDirection vertical (this EDirection value) {
+
+		gradient.current = value;
+		return gradient.vertical;
+
+	}
+
+	public static EDirection opposite (this EDirection value) {
+
+		gradient.current = value;
+		return gradient.opposite;
+
+	}
+
+	public static bool IsNone (this EDirection value) {
+
+		return (value == EDirection.None);
+
+	}
+
+	public static bool IsCardinal (this EDirection value) {
+
+		gradient.current = value;
+		return gradient.isCardinal;
+
+	}
+
+	public static EDirection Add (this EDirection value, EDirection other) {
+
+		gradient.current = value;
+		gradient.Add (other);
+		return gradient.current;
+
+	}
+
+	public static EDirection Subtract (this EDirection value, EDirection other) {
+
+		gradient.current = value;
+		gradient.Subtract (other);
+		return gradient.current;
+
+	}
+
+	public static EDirection Remove (this EDirection value, EDirection other) {
+
+		gradient.current = value;
+		gradient.Remove (other);
+		return gradient.current;
+
+	}
+
+	public static bool IsHorizontal (this EDirection value, bool strict = true) {
+
+		gradient.current = value;
+		return gradient.IsHorizontal (strict);
+
+	}
+
+	public static bool IsVertical (this EDirection value, bool strict = true) {
+
+		gradient.current = value;
+		return gradient.IsVertical (strict);
+
+	}
+
+	public static bool IsRight (this EDirection value, bool strict = false) {
+
+		gradient.current = value;
+		return gradient.IsRight (strict);
+
+	}
+
+	public static bool IsUp (this EDirection value, bool strict = false) {
+
+		gradient.current = value;
+		return gradient.IsUp (strict);
+
+	}
+
+	public static bool IsLeft (this EDirection value, bool strict = false) {
+
+		gradient.current = value;
+		return gradient.IsLeft (strict);
+
+	}
+
+	public static bool IsDown (this EDirection value, bool strict = false) {
+
+		gradient.current = value;
+		return gradient.IsDown (strict);
+
+	}
+}
+
+public class DirectionGradient : IGradient<EDirection> {
+
+	public const int DIRECTION_COUNT = 8;
+	public const int DIRECTION_HALFCOUNT = (DIRECTION_COUNT / 2);
+
+	private static readonly EDirection[] opposites;
+	private static readonly EDirection[,] projectionMatrix;
+	private static readonly EDirection[,] disprojectionMatrix;
+
+	static DirectionGradient () {
+
+		opposites = new EDirection[] {
+			EDirection.None,
+			EDirection.Left, EDirection.DownLeft, EDirection.Down, EDirection.DownRight,
+			EDirection.Right, EDirection.UpRight, EDirection.Up, EDirection.UpLeft
+		};
+
+		projectionMatrix = new EDirection[,] {
+			{ EDirection.None,      EDirection.Right,       EDirection.UpRight,     EDirection.Up,          EDirection.UpLeft,      EDirection.Left,        EDirection.DownLeft,    EDirection.Down,        EDirection.DownRight },
+			{ EDirection.Right,     EDirection.Right,       EDirection.UpRight,     EDirection.UpRight,     EDirection.Up,          EDirection.None,        EDirection.Down,        EDirection.DownRight,   EDirection.DownRight },
+			{ EDirection.UpRight,   EDirection.UpRight,     EDirection.UpRight,     EDirection.UpRight,     EDirection.Up,          EDirection.Up,          EDirection.None,        EDirection.Right,       EDirection.Right },
+			{ EDirection.Up,        EDirection.UpRight,     EDirection.UpRight,     EDirection.Up,          EDirection.UpLeft,      EDirection.UpLeft,      EDirection.Left,        EDirection.None,        EDirection.Right },
+			{ EDirection.UpLeft,    EDirection.Up,          EDirection.Up,          EDirection.UpLeft,      EDirection.UpLeft,      EDirection.UpLeft,      EDirection.Left,        EDirection.Left,        EDirection.None },
+			{ EDirection.Left,      EDirection.None,        EDirection.Up,          EDirection.UpLeft,      EDirection.UpLeft,      EDirection.Left,        EDirection.DownLeft,    EDirection.DownLeft,    EDirection.Down },
+			{ EDirection.DownLeft,  EDirection.Down,        EDirection.None,        EDirection.Left,        EDirection.Left,        EDirection.DownLeft,    EDirection.DownLeft,    EDirection.DownLeft,    EDirection.Down },
+			{ EDirection.Down,      EDirection.DownRight,   EDirection.Right,       EDirection.None,        EDirection.Left,        EDirection.DownLeft,    EDirection.DownLeft,    EDirection.Down,        EDirection.DownRight },
+			{ EDirection.DownRight, EDirection.DownRight,   EDirection.Right,       EDirection.Right,       EDirection.None,        EDirection.Down,        EDirection.Down,        EDirection.DownRight,   EDirection.DownRight }
+		};
+
+		disprojectionMatrix = new EDirection[,] {
+			{ EDirection.None,      EDirection.Right,       EDirection.UpRight,     EDirection.Up,          EDirection.UpLeft,      EDirection.Left,        EDirection.DownLeft,    EDirection.Down,        EDirection.DownRight },
+			{ EDirection.Right,     EDirection.None,        EDirection.None,        EDirection.Right,       EDirection.Right,       EDirection.Right,       EDirection.Right,       EDirection.Right,       EDirection.None },
+			{ EDirection.UpRight,   EDirection.Up,          EDirection.None,        EDirection.Right,       EDirection.Right,       EDirection.UpRight,     EDirection.UpRight,     EDirection.UpRight,     EDirection.Up },
+			{ EDirection.Up,        EDirection.Up,          EDirection.None,        EDirection.None,        EDirection.None,        EDirection.Up,          EDirection.Up,          EDirection.Up,          EDirection.Up },
+			{ EDirection.UpLeft,    EDirection.UpLeft,      EDirection.Left,        EDirection.Left,        EDirection.None,        EDirection.Up,          EDirection.Up,          EDirection.UpLeft,      EDirection.UpLeft },
+			{ EDirection.Left,      EDirection.Left,        EDirection.Left,        EDirection.Left,        EDirection.None,        EDirection.None,        EDirection.None,        EDirection.Left,        EDirection.Left },
+			{ EDirection.DownLeft,  EDirection.DownLeft,    EDirection.DownLeft,    EDirection.DownLeft,    EDirection.Down,        EDirection.Down,        EDirection.None,        EDirection.Left,        EDirection.Left },
+			{ EDirection.Down,      EDirection.Down,        EDirection.Down,        EDirection.Down,        EDirection.Down,        EDirection.Down,        EDirection.None,        EDirection.None,        EDirection.None },
+			{ EDirection.DownRight, EDirection.Down,        EDirection.Down,        EDirection.DownRight,   EDirection.DownRight,   EDirection.DownRight,   EDirection.Right,       EDirection.Right,       EDirection.None }
+		};
+
+	}
+
+	public static DirectionGradient operator + (DirectionGradient d, EDirection e) {
+
+		d.Add (e);
+		return d;
+
+	}
+
+	public static DirectionGradient operator - (DirectionGradient d, EDirection e) {
+
+		d.Subtract (e);
+		return d;
+
+	}
+
+	public EDirection current { get; set; }
+
+	public EDirection horizontal {
+
+		get {
+
+			var horz = EDirection.None;
+
+			switch (this.current) {
+
+				case EDirection.DownRight:
+				case EDirection.Right:
+				case EDirection.UpRight:
+					horz = EDirection.Right;
+					break;
+
+				case EDirection.UpLeft:
+				case EDirection.Left:
+				case EDirection.DownLeft:
+					horz = EDirection.Left;
+					break;
+
+			}
+
+			return horz;
+
+		}
+	}
+
+	public EDirection vertical {
+
+		get {
+
+			var vert = EDirection.None;
+
+			switch (this.current) {
+
+				case EDirection.UpRight:
+				case EDirection.Up:
+				case EDirection.UpLeft:
+					vert = EDirection.Up;
+					break;
+
+				case EDirection.DownLeft:
+				case EDirection.Down:
+				case EDirection.DownRight:
+					vert = EDirection.Down;
+					break;
+
+			}
+
+			return vert;
+
+		}
+	}
+
+	public EDirection opposite {
+
+		get {
+
+			return opposites[(int)this.current];
+
+		}
+	}
+
+	public bool isNone {
+
+		get {
+
+			return (this.current == EDirection.None);
+
+		}
+	}
+
+	public bool isCardinal {
+
+		get {
+
+			return (
+				(this.current == EDirection.Right)
+				|| (this.current == EDirection.Up)
+				|| (this.current == EDirection.Left)
+				|| (this.current == EDirection.Down)
+			);
+
+		}
+	}
+
+	public DirectionGradient (EDirection current = EDirection.None) {
+
+		this.current = current;
+
+	}
+
+	public EDirection Add (EDirection direction) {
+
+		this.current = this.Project (direction);
+		return this.current;
+
+	}
+
+	public EDirection Subtract (EDirection direction) {
+
+		this.Add (direction.opposite ());
+		return this.current;
+
+	}
+
+	public EDirection Remove (EDirection direction) {
+
+		this.current = this.Disproject (direction);
+		return this.current;
+
+	}
+
+	public EDirection Project (EDirection direction) {
+
+		int myInt = (int)this.current;
+		int givenInt = (int)direction;
+
+		return projectionMatrix[myInt, givenInt];
+
+	}
+
+	public EDirection Disproject (EDirection direction) {
+
+		int myInt = (int)this.current;
+		int givenInt = (int)direction;
+
+		return disprojectionMatrix[myInt, givenInt];
+
+	}
+
+	public bool IsHorizontal (bool strict = true) {
+
+		var isHorizontal = false;
+
+		if (strict) {
+
+			isHorizontal = (
+				(this.current == EDirection.Right)
+				|| (this.current == EDirection.Left)
+			);
+
+		} else {
+
+			isHorizontal = (
+				(this.current != EDirection.None)
+				&& (this.current != EDirection.Up)
+				&& (this.current != EDirection.Down)
+			);
+
+		}
+
+		return isHorizontal;
+
+	}
+
+	public bool IsVertical (bool strict = true) {
+
+		var isVertical = false;
+
+		if (strict) {
+
+			isVertical = (
+				(this.current == EDirection.Up)
+				|| (this.current == EDirection.Down)
+			);
+
+		} else {
+
+			isVertical = (
+				(this.current != EDirection.None)
+				&& (this.current != EDirection.Right)
+				&& (this.current != EDirection.Left)
+			);
+
+		}
+
+		return isVertical;
+
+	}
+
+	public bool IsRight (bool strict = false) {
+
+		var isRight = false;
+
+		if (strict) {
+
+			isRight = (this.current == EDirection.Right);
+
+		} else {
+
+			isRight = (
+				(this.current == EDirection.Right)
+				|| (this.current == EDirection.UpRight)
+				|| (this.current == EDirection.DownRight)
+			);
+
+		}
+
+		return isRight;
+
+	}
+
+	public bool IsUp (bool strict = false) {
+
+		var isUp = false;
+
+		if (strict) {
+
+			isUp = (this.current == EDirection.Up);
+
+		} else {
+
+			isUp = (
+				(this.current == EDirection.Up)
+				|| (this.current == EDirection.UpRight)
+				|| (this.current == EDirection.UpLeft)
+			);
+
+		}
+
+		return isUp;
+
+	}
+
+	public bool IsLeft (bool strict = false) {
+
+		var isLeft = false;
+
+		if (strict) {
+
+			isLeft = (this.current == EDirection.Left);
+
+		} else {
+
+			isLeft = (
+				(this.current == EDirection.Left)
+				|| (this.current == EDirection.UpLeft)
+				|| (this.current == EDirection.DownLeft)
+			);
+
+		}
+
+		return isLeft;
+
+	}
+
+	public bool IsDown (bool strict = false) {
+
+		var isDown = false;
+
+		if (strict) {
+
+			isDown = (this.current == EDirection.Down);
+
+		} else {
+
+			isDown = (
+				(this.current == EDirection.Down)
+				|| (this.current == EDirection.DownLeft)
+				|| (this.current == EDirection.DownRight)
+			);
+
+		}
+
+		return isDown;
+
+	}
+}
+
+public interface IGradient<T> {
+
+	T current { get; }
+
+}
+
+public enum EDirection {
+
+	None = 0,
+	Right = 1,
+	UpRight = 2,
+	Up = 3,
+	UpLeft = 4,
+	Left = 5,
+	DownLeft = 6,
+	Down = 7,
+	DownRight = 8
+
+}
+
+public struct angle : IEquatable<angle>, IComparable, IComparable<angle> {
+
+	public const float DIRECTION_DEGREE_INCREMENT = (SFloatMath.DEGREE_MAX_VALUE / 8f);
+	public const float DIRECTION_RADIAN_INCREMENT = (SFloatMath.RADIAN_MAX_VALUE / 8f);
+
+	public static List<angle> CreateQuarterAngles () {
+
+		var list = new List<angle> () {
+			new angle (0f, EAngleMode.Degree),
+			new angle (90f, EAngleMode.Degree),
+			new angle (180f, EAngleMode.Degree),
+			new angle (270f, EAngleMode.Degree)
+		};
+
+		return list;
+
+	}
+
+	public static bool operator == (angle a, angle b) {
+
+		return a.Equals (b);
+
+	}
+
+	public static bool operator != (angle a, angle b) {
+
+		return !a.Equals (b);
+
+	}
+
+	public static angle operator - (angle a, angle b) {
+
+		float diff = (a.value - b.GetValueUsing (a.mode));
+		return new angle (diff, a.mode);
+
+	}
+
+	public static angle operator + (angle a, angle b) {
+
+		float sum = (a.value + b.GetValueUsing (a.mode));
+		return new angle (sum, a.mode);
+
+	}
+
+	public float value { get; private set; }
+	public EAngleMode mode { get; private set; }
+	public float trimmedValue { get; private set; }
+
+	public float degree {
+
+		get {
+
+			return this.GetValueUsing (EAngleMode.Degree);
+
+		}
+	}
+
+	public float radian {
+
+		get {
+
+			return this.GetValueUsing (EAngleMode.Radian);
+
+		}
+	}
+
+	public float percent {
+
+		get {
+
+			return this.GetValueUsing (EAngleMode.Percent);
+
+		}
+	}
+
+	public angle trimmed {
+
+		get {
+
+			return (new angle (this.trimmedValue, this.mode));
+
+		}
+	}
+
+	public angle (float value, EAngleMode mode) : this () {
+
+		this.mode = mode;
+
+		if (mode == EAngleMode.Auto) {
+
+			this.value = float.NaN;
+			this.trimmedValue = float.NaN;
+
+		} else {
+
+			this.value = value;
+			this.trimmedValue = SFloatMath.TrimToRange (value, mode);
+
+		}
+	}
+
+	public angle (EDirection direction, EAngleMode mode) : this () {
+
+		this.mode = mode;
+
+		if ((mode == EAngleMode.Auto)
+			|| (direction == EDirection.None)
+		   ) {
+
+			this.value = float.NaN;
+			this.trimmedValue = float.NaN;
+
+		} else {
+
+			switch (mode) {
+
+				case EAngleMode.Degree:
+					this.value = (DIRECTION_DEGREE_INCREMENT * ((int)direction) - 1);
+					break;
+
+				case EAngleMode.Radian:
+					this.value = (DIRECTION_RADIAN_INCREMENT * ((int)direction) - 1);
+					break;
+
+				case EAngleMode.Percent:
+					this.value = ((((float)direction) - 1f) / 8f);
+					break;
+
+			}
+
+			this.trimmedValue = this.value;
+
+		}
+
+	}
+
+	public override bool Equals (object other) {
+
+		var isEqual = false;
+
+		if (other is angle otherAngle) {
+
+			isEqual = this.Equals (otherAngle);
+
+		}
+
+		return isEqual;
+
+	}
+
+	public override int GetHashCode () {
+
+		if (this.mode == EAngleMode.Auto) {
+
+			return 0;
+
+		}
+
+		int basePrime = 113;
+		int multPrime = 157;
+
+		unchecked {
+
+			var hashCode = basePrime;
+			hashCode = ((hashCode * multPrime) ^ this.value.GetHashCode ());
+			hashCode = ((hashCode * multPrime) ^ this.mode.GetHashCode ());
+
+			return hashCode;
+
+		}
+	}
+
+	public bool Equals (angle other) {
+
+		if (other.mode == EAngleMode.Auto) {
+
+			return (this.mode == EAngleMode.Auto);
+
+		}
+
+		if (this.mode == EAngleMode.Auto) {
+
+			return false;
+
+		}
+
+		float diff = (
+			this.trimmedValue
+			- other.trimmed.GetValueUsing (this.mode)
+		);
+
+		return diff.IsNegligible ();
+
+	}
+
+	public int CompareTo (object other) {
+
+		if (other is angle otherAngle) {
+
+			return this.CompareTo (otherAngle);
+
+		} else {
+
+			throw new ArgumentException (
+				"Object is not an angle. ",
+				other.GetType ().ToString () + " other"
+			);
+
+		}
+	}
+
+	public int CompareTo (angle other) {
+
+		if (other.mode == EAngleMode.Auto) {
+
+			if (this.mode == EAngleMode.Auto) {
+
+				return 0;
+
+			} else {
+
+				return 1;
+
+			}
+
+		} else {
+
+			if (this.mode == EAngleMode.Auto) {
+
+				return -1;
+
+			}
+		}
+
+		float otherValue = other.trimmed.GetValueUsing (this.mode);
+		return this.trimmedValue.CompareTo (otherValue);
+
+	}
+
+	public override string ToString () {
+
+		var message = new StringBuilder (20);
+
+		switch (this.mode) {
+
+			case EAngleMode.Auto:
+				message.Append ("ERROR: This angle has an EAngleMode of Auto, which is invalid for angle instances! ");
+				break;
+
+			case EAngleMode.Degree:
+				message.Append (this.value.ToString ());
+				message.Append (" degrees");
+				break;
+
+			case EAngleMode.Radian:
+				message.Append (this.value.ToString ());
+				message.Append (" radians");
+				break;
+
+			case EAngleMode.Percent:
+				message.AppendFormat ("{0:P2}", this.value);
+				break;
+
+		}
+
+		return message.ToString ();
+
+	}
+
+	public angle GetAs (EAngleMode otherMode) {
+
+		if (otherMode == EAngleMode.Auto) {
+
+			otherMode = this.mode;
+
+		}
+
+		return new angle (
+			this.GetValueUsing (otherMode),
+			otherMode
+		);
+
+	}
+
+	public float GetValueUsing (EAngleMode otherMode) {
+
+		if (otherMode == EAngleMode.Auto) {
+
+			otherMode = this.mode;
+
+			if (otherMode == EAngleMode.Auto) {
+
+				return float.NaN;
+
+			}
+		}
+
+		if (otherMode == this.mode) {
+
+			return this.value;
+
+		} else {
+
+			float conversionFactor = 1f;
+
+			switch (this.mode) {
+
+				case EAngleMode.Degree:
+
+					switch (otherMode) {
+
+						case EAngleMode.Radian:
+							conversionFactor = SFloatMath.DEGREE_TO_RADIAN;
+							break;
+
+						case EAngleMode.Percent:
+							conversionFactor = (1f / SFloatMath.DEGREE_MAX_VALUE);
+							break;
+
+					}
+
+					break;
+
+				case EAngleMode.Radian:
+
+					switch (otherMode) {
+
+						case EAngleMode.Degree:
+							conversionFactor = SFloatMath.RADIAN_TO_DEGREE;
+							break;
+
+						case EAngleMode.Percent:
+							conversionFactor = (1f / SFloatMath.RADIAN_MAX_VALUE);
+							break;
+
+					}
+
+					break;
+
+				case EAngleMode.Percent:
+
+					switch (otherMode) {
+
+						case EAngleMode.Degree:
+							conversionFactor = SFloatMath.DEGREE_MAX_VALUE;
+							break;
+
+						case EAngleMode.Radian:
+							conversionFactor = SFloatMath.RADIAN_MAX_VALUE;
+							break;
+
+					}
+
+					break;
+
+			}
+
+			return (this.value * conversionFactor);
+
+		}
+	}
+}
+
+public enum EAngleMode { Auto, Degree, Radian, Percent };
+
+public static partial class SFloatMath {
+
+	public const float TAU = (2f * (float)Math.PI);
+	public const float DEGREE_MAX_VALUE = 360f;
+	public const float RADIAN_MAX_VALUE = TAU;
+	public const float DEGREE_TO_RADIAN = (RADIAN_MAX_VALUE / DEGREE_MAX_VALUE);
+	public const float RADIAN_TO_DEGREE = (DEGREE_MAX_VALUE / RADIAN_MAX_VALUE);
+
+	public static float Sine (angle theta) {
+
+		float sine = 0f;
+
+		if (theta.mode == EAngleMode.Auto) {
+
+			sine = float.NaN;
+
+		} else {
+
+			sine = (float)Math.Sin ((double)theta.GetValueUsing (EAngleMode.Radian));
+
+		}
+
+		return sine;
+
+	}
+
+	public static float Cosine (angle theta) {
+
+		float cosine = 0f;
+
+		if (theta.mode == EAngleMode.Auto) {
+
+			cosine = float.NaN;
+
+		} else {
+
+			cosine = (float)Math.Cos (theta.GetValueUsing (EAngleMode.Radian));
+
+		}
+
+		return cosine;
+
+	}
+
+	public static float Tangent (angle theta) {
+
+		float tangent = 0f;
+
+		if (theta.mode == EAngleMode.Auto) {
+
+			tangent = float.NaN;
+
+		} else {
+
+			tangent = (float)Math.Tan (theta.GetValueUsing (EAngleMode.Radian));
+
+		}
+
+		return tangent;
+
+	}
+
+	public static angle Arctangent (float tangent) {
+
+		return new angle (
+			(float)Math.Atan (tangent),
+			EAngleMode.Radian
+		);
+
+	}
+
+	public static angle Arctangent (float rise, float run) {
+
+		return new angle (
+			(float)Math.Atan2 (rise, run),
+			EAngleMode.Radian
+		);
+
+	}
+
+	public static angle Arctangent (pair2f pair) {
+
+		return Arctangent (pair.y, pair.x);
+
+	}
+
+	public static float TrimToRange (
+		float value,
+		EAngleMode angleMode,
+		bool lowerInclusive = true,
+		bool upperInclusive = false
+	) {
+
+		float trimmedValue = value;
+
+		switch (angleMode) {
+
+			case EAngleMode.Degree:
+
+				trimmedValue = TrimToRange (
+					value,
+					0f,
+					DEGREE_MAX_VALUE,
+					lowerInclusive,
+					upperInclusive
+				);
+
+				break;
+
+			case EAngleMode.Radian:
+
+				trimmedValue = TrimToRange (
+					value,
+					0f,
+					RADIAN_MAX_VALUE,
+					lowerInclusive,
+					upperInclusive
+				);
+
+				break;
+
+			case EAngleMode.Percent:
+
+				trimmedValue = TrimToRange (
+					value,
+					0f,
+					1f,
+					lowerInclusive,
+					upperInclusive
+				);
+
+				break;
+
+		}
+
+		return trimmedValue;
+
+	}
+}
+
+public static partial class SFloatMath {
+
+	public const float MINIMUM_DIFFERENCE = 0.000001f;
+
+	public static pair2f GetRotatedPosition2D (pair2f position, angle theta) {
+
+		float sine = Sine (theta);
+		float cosine = Cosine (theta);
+
+		float x = (
+			(position.x * cosine)
+			- (position.y * sine)
+		);
+
+		float y = (
+			(position.x * sine)
+			+ (position.y * cosine)
+		);
+
+		return new pair2f (x, y);
+
+	}
+
+	public static float GetDotProduct (pair2f p, pair2f q) {
+
+		return (
+			(p.x * q.x)
+			+ (p.y * q.y)
+		);
+
+	}
+
+	public static float TrimToRange (
+		float value,
+		float lower,
+		float upper,
+		bool lowerInclusive = true,
+		bool upperInclusive = false
+	) {
+
+		float trimmedValue = value;
+		float diff = (upper - lower);
+
+		if (!IsFloatNegligible (diff)) {
+
+			if (lowerInclusive) {
+
+				while (trimmedValue < lower) {
+
+					trimmedValue += diff;
+
+				}
+
+			} else {
+
+				while (trimmedValue <= lower) {
+
+					trimmedValue += diff;
+
+				}
+			}
+
+			if (upperInclusive) {
+
+				while (trimmedValue > upper) {
+
+					trimmedValue -= diff;
+
+				}
+
+			} else {
+
+				while (trimmedValue >= upper) {
+
+					trimmedValue -= diff;
+
+				}
+			}
+		}
+
+		return trimmedValue;
+
+	}
+
+	public static float TrimToRange (
+		float value,
+		pair2f range,
+		bool lowerInclusive = true,
+		bool upperInclusive = false
+	) {
+
+		return TrimToRange (
+			value,
+			range.x,
+			range.y,
+			lowerInclusive,
+			upperInclusive
+		);
+
+	}
+
+	public static int NonzeroSign (float value) {
+
+		int sign = 0;
+
+		if (value < 0f) {
+
+			sign = -1;
+
+		} else {
+
+			sign = 1;
+
+		}
+
+		return sign;
+
+	}
+}
+
+public static partial class SFloatMath {
+
+	public static bool IsFloatInfinite (float value) {
+
+		return (
+			value >= float.PositiveInfinity
+			|| value <= float.NegativeInfinity
+		);
+
+	}
+
+	public static bool IsFloatNegligible (
+		float value,
+		float minimumAbsoluteValue = MINIMUM_DIFFERENCE
+	) {
+
+		float abs = Math.Abs (value);
+		return (abs < minimumAbsoluteValue);
+
+	}
+
+	public static float GetSquareRoot (float value) {
+
+		double dval = (double)value;
+
+		return (
+			(float)Math.Sqrt (dval)
+		);
+
+	}
+
+	public static int GetSign (
+		float value,
+		bool isUsingMinimumValue = false,
+		float minimumAbsoluteValue = MINIMUM_DIFFERENCE
+	) {
+
+		int sign;
+
+		if (isUsingMinimumValue) {
+
+			if (IsFloatNegligible (value, minimumAbsoluteValue)) {
+
+				sign = 0;
+
+			} else if (value > 0f) {
+
+				sign = 1;
+
+			} else {
+
+				sign = -1;
+
+			}
+
+		} else {
+
+			if (value > 0f) {
+
+				sign = 1;
+
+			} else if (value < 0f) {
+
+				sign = -1;
+
+			} else {
+
+				sign = 0;
+
+			}
+		}
+
+		return sign;
+
+	}
+}
+
+public interface ICurve2DSegment : ICurve2D {
+
+	pair2f head { get; }
+	pair2f tail { get; }
+	ICurve2D parent { get; }
+
+	pair2f GetPoint (float interpolation);
+
+}
+
+public interface ICurve2D {
+
+	//ICurve2DSegment CreateSegment (pair2f head, pair2f tail);
+	bool IsPointOnCurve (pair2f point);
+
+}
+
+internal static class SFloatExtensions {
+
+	internal static bool IsInfinite (this float value) {
+
+		return SFloatMath.IsFloatInfinite (value);
+
+	}
+
+	internal static bool IsNegligible (
+		this float value,
+		float minimumAbsoluteValue = SFloatMath.MINIMUM_DIFFERENCE
+	) {
+
+		return SFloatMath.IsFloatNegligible (value, minimumAbsoluteValue);
+
+	}
+
+	internal static bool IsNaN (this float value) {
+
+		return float.IsNaN (value);
+
+	}
+
+	internal static float abs (this float value) {
+
+		return Math.Abs (value);
+
+	}
+
+	internal static float sqrt (this float value) {
+
+		return SFloatMath.GetSquareRoot (value);
+
+	}
+
+	internal static int sign (
+		this float value,
+		bool isUsingMinimumValue = false,
+		float minimumAbsoluteValue = SFloatMath.MINIMUM_DIFFERENCE
+	) {
+
+		return SFloatMath.GetSign (
+			value,
+			isUsingMinimumValue,
+			minimumAbsoluteValue
+		);
+
+	}
+}
+
+public static class SDirectionMathExtensions {
+
+	private static DirectionGradient gradient;
+
+	static SDirectionMathExtensions () {
+
+		gradient = new DirectionGradient ();
+
+	}
+
+	public static EDirection AddHorizontal (
+		this DirectionGradient direction,
+		float value,
+		bool strict = false,
+		bool rightIsPositive = true
+	) {
+
+		if (strict || !value.IsNegligible ()) {
+
+			if (value > 0f) {
+
+				direction.Add (
+					rightIsPositive
+					? EDirection.Right
+					: EDirection.Left
+				);
+
+			} else if (value < 0f) {
+
+				direction.Add (
+					rightIsPositive
+					? EDirection.Left
+					: EDirection.Right
+				);
+
+			}
+		}
+
+		return direction.current;
+
+	}
+
+	public static EDirection AddVertical (
+		this DirectionGradient direction,
+		float value,
+		bool strict = false,
+		bool upIsPositive = true
+	) {
+
+		if (strict || !value.IsNegligible ()) {
+
+			if (value > 0f) {
+
+				direction.Add (
+					upIsPositive
+					? EDirection.Up
+					: EDirection.Down
+				);
+
+			} else if (value < 0f) {
+
+				direction.Add (
+					upIsPositive
+					? EDirection.Down
+					: EDirection.Up
+				);
+
+			}
+		}
+
+		return direction.current;
+
+	}
+
+	public static EDirection Add (
+		this DirectionGradient direction,
+		pair2f point,
+		bool strict = false,
+		bool rightIsPositive = true,
+		bool upIsPositive = true
+	) {
+
+		direction.AddHorizontal (
+			point.x, strict, rightIsPositive
+		);
+		direction.AddVertical (
+			point.y, strict, upIsPositive
+		);
+
+		return direction.current;
+
+	}
+
+	public static EDirection AddHorizontal (
+		this EDirection direction,
+		float value,
+		bool strict = false,
+		bool rightIsPositive = true
+	) {
+
+		gradient.current = direction;
+		return gradient.AddHorizontal (value, strict, rightIsPositive);
+
+	}
+
+	public static EDirection AddVertical (
+		this EDirection direction,
+		float value,
+		bool strict = false,
+		bool upIsPositive = true
+	) {
+
+		gradient.current = direction;
+		return gradient.AddVertical (value, strict, upIsPositive);
+
+	}
+
+	public static EDirection Add (
+		this EDirection direction,
+		pair2f point,
+		bool strict = false,
+		bool rightIsPositive = true,
+		bool upIsPositive = true
+	) {
+
+		gradient.current = direction;
+		return gradient.Add (point, strict, rightIsPositive, upIsPositive);
+
+	}
+
+	public static angle ToAngle (this EDirection value) {
+
+		return new angle (value, EAngleMode.Degree);
+
+	}
+
+	public static pair2f ToPair (this EDirection value) {
+
+		float x = 0f, y = 0f;
+
+		if (value.IsRight ()) {
+
+			x += 1f;
+
+		} else if (value.IsLeft ()) {
+
+			x -= 1f;
+
+		}
+
+		if (value.IsUp ()) {
+
+			y += 1f;
+
+		} else if (value.IsDown ()) {
+
+			y -= 1f;
+
+		}
+
+		return new pair2f (x, y);
+
+	}
+}
+
+public class Line2D : ICurve2D {
+
+	public float slope { get; private set; }
+	public float yIntercept { get; private set; }
+	public float xIntercept { get; private set; }
+
+	public bool isHorizontal {
+
+		get {
+
+			return slope.IsNegligible ();
+
+		}
+	}
+
+	public bool isVertical {
+
+		get {
+
+			return slope.IsInfinite ();
+
+		}
+	}
+
+	public Line2D (pair2f point1, pair2f point2) {
+
+		float xdiff = (point1.x - point2.x);
+		float ydiff = (point1.y - point2.y);
+
+		if (xdiff.IsNegligible ()
+			&& ydiff.IsNegligible ()
+		   ) {
+
+			// TODO - Throw an exception.
+
+		}
+
+		this.slope = (ydiff / xdiff);
+		this.yIntercept = (point1.y - (this.slope * point1.x));
+		this.xIntercept = (point1.x - (point1.y / this.slope));
+
+	}
+
+	public Line2D (float x1, float y1, float x2, float y2) : this (
+		new pair2f (x1, y1),
+		new pair2f (x2, y2)
+	) {
+	}
+
+	public Line2D (float slope, pair2f point = default(pair2f)) {
+
+		if (slope.IsInfinite ()) {
+
+			this.xIntercept = point.x;
+			this.yIntercept = float.NegativeInfinity;
+
+		} else if (slope.IsNegligible ()) {
+
+			this.xIntercept = float.NegativeInfinity;
+			this.yIntercept = point.y;
+
+		} else {
+
+			this.yIntercept = (point.y - (this.slope * point.x));
+			this.xIntercept = (point.x - (point.y / this.slope));
+
+		}
+
+		this.slope = slope;
+
+	}
+
+	public Line2D (angle slopeAngle, pair2f point = default(pair2f)) : this (
+		SFloatMath.Tangent (slopeAngle),
+		point
+	) {
+	}
+
+	public bool IsParallelTo (float otherSlope) {
+
+		return (this.slope - otherSlope).IsNegligible ();
+
+	}
+
+	public bool IsParallelTo (Line2D other) {
+
+		return this.IsParallelTo (other.slope);
+
+	}
+
+	public pair2f GetIntersection (Line2D otherLine, bool cachePoint = false) {
+
+		var intersection = pair2f.origin;
+
+		if (this.isVertical) {
+
+			if (otherLine.isVertical) {
+
+				intersection = new pair2f (0f, float.PositiveInfinity);
+
+			} else {
+
+				intersection = new pair2f (
+					this.xIntercept,
+					otherLine.y (this.xIntercept)
+				);
+
+			}
+
+		} else if (this.isHorizontal) {
+
+			if (otherLine.isHorizontal) {
+
+				intersection = new pair2f (float.PositiveInfinity, 0f);
+
+			} else {
+
+				intersection = new pair2f (
+					otherLine.x (this.yIntercept),
+					this.yIntercept
+				);
+
+			}
+
+		} else {
+
+			if (this.IsParallelTo (otherLine.slope)) {
+
+				intersection = new pair2f (
+					float.PositiveInfinity,
+					(this.slope * float.PositiveInfinity)
+				);
+
+			} else {
+
+				float x = (
+					(otherLine.yIntercept - this.yIntercept)
+					/ (this.slope - otherLine.slope)
+				);
+
+				intersection = new pair2f (x, this.y (x));
+
+			}
+		}
+
+		return intersection;
+
+	}
+
+	public float GetDistanceToPoint (pair2f point) {
+
+		float distance = 0f;
+
+		if (this.isVertical) {
+
+			distance = Math.Abs (point.x - this.xIntercept);
+
+		} else if (this.isHorizontal) {
+
+			distance = Math.Abs (point.y - this.yIntercept);
+
+		} else {
+
+			float numerator = Math.Abs (
+				(point.x * this.slope)
+				- point.y
+				+ this.yIntercept
+			);
+			float denominator = SFloatMath.GetSquareRoot (
+				(this.slope * this.slope) + 1f
+			);
+
+			distance = (numerator / denominator);
+
+		}
+
+		return distance;
+
+	}
+
+	public float x (float y) {
+
+		return (this.xIntercept + (y / this.slope));
+
+	}
+
+	public float y (float x) {
+
+		return (this.yIntercept + (x * this.slope));
+
+	}
+
+	public EDirection GetDirectionToPoint (pair2f point) {
+
+		var direction = new DirectionGradient ();
+
+		if (this.isVertical) {
+
+			direction.AddHorizontal (point.x - this.xIntercept);
+
+		} else if (this.isHorizontal) {
+
+			direction.AddVertical (point.y - this.yIntercept);
+
+		} else {
+
+			float x = this.x (point.y);
+			float y = this.y (point.x);
+
+			direction.AddHorizontal (point.x - x);
+			direction.AddVertical (point.y - y);
+
+		}
+
+		return direction.current;
+
+	}
+
+	public EDirection GetHorizontalDirectionToPoint (pair2f point) {
+
+		var direction = new DirectionGradient ();
+
+		if (!this.isHorizontal) {
+
+			float x = this.x (point.y);
+			direction.AddHorizontal (point.x - x);
+
+		}
+
+		return direction.current;
+
+	}
+
+	public EDirection GetVerticalDirectionToPoint (pair2f point) {
+
+		var direction = new DirectionGradient ();
+
+		if (!this.isVertical) {
+
+			float y = this.y (point.x);
+			direction.AddVertical (point.y - y);
+
+		}
+
+		return direction.current;
+
+	}
+	
+	public bool IsPointOnLine (pair2f point, bool lenient = false) {
+		
+		return (SFloatMath.GetOrientation (
+			new pair2f (0f, this.yIntercept),
+			new pair2f (1f, (this.yIntercept + this.slope)),
+			point,
+			lenient
+		) == 0);
+		
+	}
+	
+	bool ICurve2D.IsPointOnCurve (pair2f point) => this.IsPointOnLine (point);
+	
+}
+
+public static partial class SShapeMath {
+
+	public static bool IsLineSegmentIntersectingAnother (
+		pair2f line1point1,
+		pair2f line1point2,
+		pair2f line2point1,
+		pair2f line2point2,
+		bool disallowParallel = true,
+		bool isIntersectionLenient = false,
+		float tolerance = SFloatMath.MINIMUM_ORIENTATION
+	) {
+
+		var isIntersecting = false;
+
+		int orientation1a = SFloatMath.GetOrientation (
+			line2point1,
+			line1point1,
+			line1point2,
+			isIntersectionLenient,
+			tolerance
+		);
+
+		isIntersecting = (orientation1a == 0);
+
+		if (!isIntersecting || disallowParallel) {
+
+			int orientation1b = SFloatMath.GetOrientation (
+				line2point2,
+				line1point1,
+				line1point2,
+				isIntersectionLenient,
+				tolerance
+			);
+
+			if (orientation1a != orientation1b) {
+
+				int orientation2a = SFloatMath.GetOrientation (
+					line1point1,
+					line2point1,
+					line2point2,
+					isIntersectionLenient,
+					tolerance
+				);
+
+				isIntersecting = (orientation2a == 0);
+
+				if (!isIntersecting) {
+
+					int orientation2b = SFloatMath.GetOrientation (
+						line1point2,
+						line2point1,
+						line2point2,
+						isIntersectionLenient,
+						tolerance
+					);
+
+					isIntersecting = (orientation2a != orientation2b);
+
+				}
+
+			} else if (disallowParallel) {
+
+				isIntersecting = false;
+
+			}
+		}
+
+		return isIntersecting;
+
+	}
+
+	public static pair2f FindIntersectionOfLineSegments (
+		pair2f line1point1,
+		pair2f line1point2,
+		pair2f line2point1,
+		pair2f line2point2
+	) {
+
+		var intersection = pair2f.nan;
+
+		var slope1 = (line1point1 - line1point2);
+		var slope2 = (line2point1 - line2point2);
+		float x1diff = (line1point1.x - line2point1.x);
+		float y1diff = (line1point1.y - line2point1.y);
+
+		float denominator = ((slope1.x * slope2.y) - (slope1.y * slope2.x));
+		float interpolation1 = (((slope2.y * x1diff) - (slope2.x * y1diff)) / denominator);
+
+		if ((interpolation1 >= 0f) && (interpolation1 <= 1f)) {
+
+			float interpolation2 = (((slope1.y * x1diff) - (slope1.x * y1diff)) / denominator);
+
+			if ((interpolation2 >= 0f) && (interpolation2 <= 1f)) {
+
+				intersection = (
+					line1point1 + (
+						(
+							line1point2
+							- line1point1
+						)
+					) * interpolation1
+				);
+
+			}
+		}
+
+		return intersection;
+
+	}
+}
+
+public class Line2DSegment : ICurve2DSegment {
+
+	public const int PARALLEL_THIS = 0;
+	public const int PARALLEL_OTHER = 1;
+
+	private Line2DSegment parentSegment;
+
+	public pair2f tail { get; private set; }
+	public pair2f head { get; private set; }
+
+	public ICurve2D parent {
+
+		get {
+
+			return (parentSegment ?? new Line2DSegment (this.tail, this.head));
+
+		}
+	}
+
+	public pair2f difference {
+
+		get {
+
+			return (this.head - this.tail);
+
+		}
+	}
+
+	public Line2DSegment (pair2f tail, pair2f head, Line2DSegment parent = null) {
+
+		this.tail = tail;
+		this.head = head;
+		this.parentSegment = parent;
+
+	}
+
+	public void Deconstruct (out pair2f one, out pair2f two) {
+
+		one = this.tail;
+		two = this.head;
+
+	}
+
+	public pair2f GetPoint (float interpolation) {
+
+		return (this.tail + (this.difference * interpolation));
+
+	}
+
+	public bool IsIntersecting (Line2DSegment other, bool disallowParallel = false)
+		=> SShapeMath.IsLineSegmentIntersectingAnother (this.tail, this.head, other.tail, other.head, disallowParallel);
+
+	public pair2f FindIntersection (Line2DSegment other)
+		=> SShapeMath.FindIntersectionOfLineSegments (this.tail, this.head, other.tail, other.head);
+
+	public Pair<pair2f> FindParallelIntersections (Line2DSegment other)
+		=> this.FindParallelIntersections (other, out IntPair positions);
+
+	public Pair<pair2f> FindParallelIntersections (Line2DSegment other, out IntPair positions) {
+
+		int tailpos, headpos;
+
+		var taildiff = (this.tail - other.tail);
+		var headdiff = (this.tail - other.head);
+		tailpos = ((taildiff.ToDirection () == headdiff.ToDirection ()) ? PARALLEL_OTHER : PARALLEL_THIS);
+
+		taildiff = (this.head - other.tail);
+		headdiff = (this.head - other.head);
+		headpos = ((taildiff.ToDirection () == headdiff.ToDirection ()) ? PARALLEL_OTHER : PARALLEL_THIS);
+
+		positions = new IntPair (tailpos, headpos);
+		return new Pair<pair2f> (
+			((tailpos == PARALLEL_THIS) ? this.tail : other.tail),
+			((headpos == PARALLEL_THIS) ? this.head : other.head)
+		);
+
+	}
+	
+	public bool IsPointOnSegment (pair2f point, bool lenient = false) {
+		
+		var isOnSegment = false;
+		
+		if (SFloatMath.GetOrientation (this.tail, this.head, point, lenient) == 0) {
+			
+			isOnSegment = ((point - this.tail).ToDirection () == (this.head - point).ToDirection ());
+			
+		}
+		
+		return isOnSegment;
+		
+	}
+}
+
+public class Pair<T> {
+
+	public T one { get; set; }
+	public T two { get; set; }
+
+	public T this [int index] {
+
+		get {
+
+			T value = default (T);
+
+			if (index == 0) {
+
+				value = one;
+
+			} else if (index == 1) {
+
+				value = two;
+
+			} else {
+
+				throw new IndexOutOfRangeException ();
+
+			}
+
+			return value;
+
+		}
+	}
+
+	public T this [bool second] => (second ? this.two : this.one);
+
+	public Pair (T one = default(T), T two = default(T)) {
+
+		this.one = one;
+		this.two = two;
+
+	}
+
+	public T opposite (int index) {
+
+		T value = default (T);
+
+		if (index == 0) {
+
+			value = two;
+
+		} else if (index == 1) {
+
+			value = one;
+
+		} else {
+
+			throw new IndexOutOfRangeException ();
+
+		}
+
+		return value;
+
+	}
+
+	public void Deconstruct (out T one, out T two) {
+
+		one = this.one;
+		two = this.two;
+
+	}
+
+	// TODO - Give this class the full stuff it needs
+
+}
+
+public struct IntPair {
+
+	public static readonly IntPair zero;
+
+	static IntPair () {
+
+		zero = new IntPair ();
+
+	}
+
+	public int one { get; private set; }
+	public int two { get; private set; }
+
+	public int this [int index] {
+
+		get {
+
+			int value;
+
+			if (index == 0) {
+
+				value = one;
+
+			} else if (index == 1) {
+
+				value = two;
+
+			} else {
+
+				throw new IndexOutOfRangeException ();
+
+			}
+
+			return value;
+
+		}
+	}
+
+	public int this [bool second] => (second ? this.two : this.one);
+
+	public IntPair (int one, int two) : this () {
+
+		this.one = one;
+		this.two = two;
+
+	}
+
+	public int opposite (int index) {
+
+		int value;
+
+		if (index == 0) {
+
+			value = two;
+
+		} else if (index == 1) {
+
+			value = one;
+
+		} else {
+
+			throw new IndexOutOfRangeException ();
+
+		}
+
+		return value;
+
+	}
+
+	public void Deconstruct (out int one, out int two) {
+
+		one = this.one;
+		two = this.two;
+
+	}
+
+	// TODO - Give this class the full stuff it needs
+
+}
+
+public struct pair2f : IReadOnlyList<float>, IEquatable<pair2f> {
+
+	public static readonly pair2f origin;
+	public static readonly pair2f nan;
+
+	static pair2f () {
+
+		origin = new pair2f ();
+		nan = new pair2f () {
+			x = float.NaN,
+			y = float.NaN
+		};
+
+	}
+
+	public static bool operator == (pair2f p, pair2f q) {
+
+		return p.Equals (q);
+
+	}
+
+	public static bool operator != (pair2f p, pair2f q) {
+
+		return !p.Equals (q);
+
+	}
+
+	public static pair2f operator + (pair2f p, pair2f q) {
+
+		return new pair2f ((p.x + q.x), (p.y + q.y));
+
+	}
+
+	public static pair2f operator - (pair2f p, pair2f q) {
+
+		return new pair2f ((p.x - q.x), (p.y - q.y));
+
+	}
+
+	public static pair2f operator * (pair2f p, float f) {
+
+		return new pair2f ((p.x * f), (p.y * f));
+
+	}
+
+	public static pair2f operator / (pair2f p, float f) {
+
+		return new pair2f ((p.x / f), (p.y / f));
+
+	}
+
+	public static pair2f operator - (pair2f p) {
+
+		return new pair2f (-p.x, -p.y);
+
+	}
+
+	public float x { get; private set; }
+	public float y { get; private set; }
+
+	int IReadOnlyCollection<float>.Count {
+
+		get {
+
+			return 2;
+
+		}
+	}
+
+	public float this [int index] {
+
+		get {
+
+			float value;
+
+			if (index == 0) {
+
+				value = x;
+
+			} else if (index == 1) {
+
+				value = y;
+
+			} else {
+
+				throw new IndexOutOfRangeException ();
+
+			}
+
+			return value;
+
+		}
+	}
+
+	public float magnitude {
+
+		get {
+
+			return ((this.x * this.x) + (this.y * this.y)).sqrt ();
+
+		}
+	}
+
+	public bool isNan => (Single.IsNaN (this.x) || Single.IsNaN (this.y));
+
+	public pair2f (float x, float y) : this () {
+
+		this.x = x;
+		this.y = y;
+
+	}
+
+	public IEnumerator<float> GetEnumerator () {
+
+		var array = new float[] { this.x, this.y };
+		return (IEnumerator<float>)array.GetEnumerator ();
+
+	}
+
+	IEnumerator IEnumerable.GetEnumerator () {
+
+		var array = new float[] { this.x, this.y };
+		return array.GetEnumerator ();
+
+	}
+
+	public override bool Equals (object other) {
+
+		var isEqual = false;
+
+		if (other is pair2f) {
+
+			var otherPair = (pair2f)other;
+			isEqual = this.Equals (otherPair);
+
+		}
+
+		return isEqual;
+
+	}
+
+	public override int GetHashCode () {
+
+		int basePrime = 61;
+		int multPrime = 229;
+
+		unchecked {
+
+			var hashCode = basePrime;
+			hashCode = ((hashCode * multPrime) ^ this.x.GetHashCode ());
+			hashCode = ((hashCode * multPrime) ^ this.y.GetHashCode ());
+
+			return hashCode;
+
+		}
+	}
+
+	public bool Equals (pair2f other) {
+
+		float xdiff = (this.x - other.x);
+		float ydiff = (this.y - other.y);
+
+		return (xdiff.IsNegligible () && ydiff.IsNegligible ());
+
+	}
+
+	public EDirection ToDirection () => EDirection.None.Add (this);
+
+	public void Deconstruct (out float one, out float two) {
+
+		one = this.x;
+		two = this.y;
+
+	}
+}
+
+public interface IShape2D {
+
+	pair2f center { get; }
+	bool isConvex { get; }
+
+	bool IsContainingPoint (pair2f point);
+	List<pair2f> CreateVertexList ();
+	List<ICurve2D> CreateCurveList ();
+	List<ICurve2DSegment> CreateCurveSegmentList ();
+
+}
+
+public interface IPolygon2D : IShape2D {
+
+	pair2f this [int index] { get; }
+	Line2DSegment this [IntPair indicies] { get; }
+	Line2DSegment this [int one, int two] { get; }
+
+	int GetNextIndex (int index);
+	int GetPreviousIndex (int index);
+	List<Line2D> CreateLineList ();
+	List<Line2DSegment> CreateLineSegmentList ();
+	List<IntPair> CreateLineSegmentIndexList ();
+
+}
+
+public static partial class SShapeMath {
+
+	public const int MINIMUM_VERTEX_COUNT = 3;
+
+	public static pair2f GetCenter (List<pair2f> shape) {
+
+		var center = pair2f.origin;
+
+		for (int i = 0; i < shape.Count; i++) {
+
+			center += shape[i];
+
+		}
+
+		return (center / ((float)shape.Count));
+
+	}
+
+	public static bool IsConvex (List<pair2f> polygon) {
+
+		return IsConvex (new ReadOnlyCollection<pair2f> (polygon));
+
+	}
+
+	public static bool IsConvex (ReadOnlyCollection<pair2f> polygon) {
+
+		var isConvex = true;
+
+		if (polygon.Count > 3) {
+
+			int i, orientation = SFloatMath.GetOrientation (
+				polygon[0],
+				polygon[1],
+				polygon[2],
+				isUsingMinimumValue: true
+			);
+
+			isConvex = (orientation != 0);
+
+			if (isConvex) {
+
+				for (i = 3; isConvex && (i < polygon.Count); i++) {
+
+					isConvex = (orientation == SFloatMath.GetOrientation (
+						polygon[i - 2],
+						polygon[i - 1],
+						polygon[i],
+						isUsingMinimumValue: true
+					));
+
+				}
+
+				if (isConvex) {
+
+					isConvex = (orientation == SFloatMath.GetOrientation (
+						polygon[i - 2],
+						polygon[i - 1],
+						polygon[0],
+						isUsingMinimumValue: true
+					));
+
+					if (isConvex) {
+
+						isConvex = (orientation == SFloatMath.GetOrientation (
+							polygon[i - 1],
+							polygon[0],
+							polygon[1],
+							isUsingMinimumValue: true
+						));
+
+					}
+				}
+			}
+		}
+
+		return isConvex;
+
+	}
+}
+
+public static partial class SShapeMath {
+
+	public static List<pair2f> GetConvexHull (
+		IEnumerable<pair2f> shape,
+		pair2f normal = new pair2f (0f, 1f)
+	) {
+
+		var hull = new List<pair2f> ();
+
+		var current = new List<pair2f> (shape);
+		var furthest = (index: -1, value: float.NaN);
+		var origin = pair2f.origin;
+		int insertionIndex = 0;
+		int prevHullCount = 0;
+
+		while ((current.Count > 0) && (insertionIndex <= hull.Count)) {
+
+			for (int i = 0; i < current.Count; i++) {
+
+				float dot = SFloatMath.GetDotProduct (
+					(current[i] - origin),
+					normal
+				);
+
+				if ((dot > furthest.value) || Single.IsNaN (furthest.value)) {
+
+					furthest.value = dot;
+					furthest.index = i;
+
+				}
+			}
+
+			if (furthest.index > -1) {
+
+				hull.Insert (insertionIndex, current[furthest.index]);
+				current.RemoveAt (furthest.index);
+
+			} else {
+
+				insertionIndex++;
+
+			}
+
+			if (prevHullCount != hull.Count) {
+
+				if (hull.Count >= 3) {
+
+					current = RemoveConvexShapeFromList (hull, current);
+
+				}
+
+				prevHullCount = hull.Count;
+
+			}
+
+			if (hull.Count < 2) {
+
+				normal *= -1f;
+				origin = hull[0];
+
+				insertionIndex = 1;
+
+			} else {
+
+				// Reminder that this function returns a clockwise vector.
+				normal = SFloatMath.GetNormalComponents (
+					hull[insertionIndex - 1],
+					hull[insertionIndex % hull.Count]
+				);
+				// An out of bounds exception could be thrown here.
+				origin = hull[insertionIndex];
+
+			}
+
+			furthest.index = -1;
+			furthest.value = 0f;
+
+		}
+
+		return hull;
+
+	}
+
+	private static List<pair2f> RemoveConvexShapeFromList (
+		List<pair2f> shape,
+		List<pair2f> list,
+		bool allowBoundary = true,
+		float tolerance = SFloatMath.MINIMUM_ORIENTATION
+	) {
+
+		for (int i = (list.Count - 1); i >= 0; i--) {
+
+			if (IsPointInConvexShape (
+				list[i],
+				shape,
+				allowBoundary,
+				tolerance
+			)) {
+
+				list.RemoveAt (i);
+
+			}
+		}
+
+		return list;
+
+	}
+}
+
+public class ConvexPolygon2D : APolygon2D {
+
+	private bool _isConvex;
+	private pair2f _center;
+	
+	public override pair2f center => this._center;
+
+	public sealed override bool isConvex {
+
+		get {
+
+			if (!this._isConvex) {
+
+				this._isConvex = this.ConfirmConvexity (ref this.verticies);
+
+			}
+
+			return this._isConvex;
+
+		}
+	}
+
+	public ConvexPolygon2D (IEnumerable<pair2f> verticies) {
+
+		this.verticies = new ReadOnlyCollection<pair2f> (
+			SShapeMath.GetConvexHull (verticies, out this._center)
+		);
+		this._isConvex = (this.count > 0);
+
+	}
+
+	public ConvexPolygon2D (ref List<pair2f> input, bool confirmConvexity = false) : base (
+		ref input
+	) {
+
+		this._isConvex = (confirmConvexity ? this.ConfirmConvexity (ref this.verticies) : false);
+
+	}
+
+	public ConvexPolygon2D (ref ReadOnlyCollection<pair2f> input, bool confirmConvexity = false) : base (
+		ref input
+	) {
+
+		this._isConvex = (confirmConvexity ? this.ConfirmConvexity (ref this.verticies) : false);
+
+	}
+
+	private bool ConfirmConvexity (ref ReadOnlyCollection<pair2f> verticies) {
+
+		var isConvex = SShapeMath.IsConvex (verticies);
+
+		if (!isConvex) {
+
+			verticies = new ReadOnlyCollection<pair2f> (SShapeMath.GetConvexHull (verticies));
+			isConvex = (verticies?.Count > 0);
+
+		}
+
+		return isConvex;
+
+	}
+
+	public override bool IsContainingPoint (pair2f point)
+		=> SShapeMath.IsPointInConvexShape (point, new List<pair2f> (this.verticies));
+
+	public Pair<pair2f> FindSegmentIntersections (Line2DSegment segment, int start = 0, int end = -1, bool returnOnFirst = false)
+		=> this.FindSegmentIntersections (segment, out IntPair indicies, out bool isParallel, start, end, returnOnFirst);
+
+	public Pair<pair2f> FindSegmentIntersections (
+		Line2DSegment segment,
+		out IntPair indicies,
+		out bool isParallel,
+		int start = 0,
+		int end = -1,
+		bool returnOnFirst = false
+	) {
+
+		var intersection1 = pair2f.nan;
+		var intersection2 = pair2f.nan;
+		indicies = new IntPair (-1, -1);
+		isParallel = false;
+
+		if (end < 0) {
+
+			end = start;
+
+		}
+
+		int index = start;
+		var distance = Single.PositiveInfinity;
+
+		do {
+
+			var next = this.GetNextIndex (index);
+			var current = this [index, next];
+
+			if (indicies.one < 0) {
+
+				if (segment.IsIntersecting (current, disallowParallel: false)) {
+
+					indicies = new IntPair (index, -1);
+					intersection1 = segment.FindIntersection (current);
+					isParallel = intersection1.isNan;
+
+					// If the intersection is parallel...
+					if (isParallel) {
+
+						// Resolve it, then indicate where the parallel intersection ended.
+						(intersection1, intersection2) = current.FindParallelIntersections (segment, out IntPair positions);
+						indicies = new IntPair (indicies.one, positions.two);
+
+						// Parallel intersection means there are no other intersections.
+						break;
+
+					}
+
+					if (returnOnFirst) {
+
+						break;
+
+					} else {
+
+						// If the segment intersected on a vertex and is not parallel...
+						if (intersection1 == current.head) {
+
+							// Then skip the next polygon segment, because otherwise it would intersect on the same vertex.
+							next = this.GetNextIndex (next);
+
+						} else if ((start == end) && (intersection1 == current.tail)) {
+
+							// If the intersection is on current's tail, then this must be the first segment on the polygon.
+							// Skip the last segment on the polygon for the same reason as above.
+							end = this.GetPreviousIndex (end);
+
+						}
+
+						distance = (intersection1 - segment.tail).magnitude;
+
+					}
+				}
+
+			} else {
+
+				// There's less logic we have to do if we've already found one intersection, since the next one we find will be the last.
+				var intersection = segment.FindIntersection (current);
+
+				if (!intersection.isNan) {
+
+					if ((intersection - segment.tail).magnitude < distance) {
+
+						intersection2 = intersection1;
+						intersection1 = intersection;
+						indicies = new IntPair (index, indicies.one);
+
+					} else {
+
+						intersection2 = intersection;
+						indicies = new IntPair (indicies.one, index);
+
+					}
+
+					break;
+
+				}
+			}
+
+			index = next;
+
+		} while (index != end);
+
+		return new Pair<pair2f> (intersection1, intersection2);
+
+	}
+
+	public ConvexPolygon2D FindOverlap (ConvexPolygon2D other, bool qualifyOverlapImmediately = false) {
+
+		var overlap = new List<pair2f> ();
+		var intersections = new Queue<pair2f> ();
+		var vertexIndicies = new Queue<IntPair> ();
+
+		int next, index = 0, otherIndex = 0;
+		do {
+
+			next = this.GetNextIndex (index);
+			var current = this[index, next];
+
+			var (intersection1, intersection2) = other.FindSegmentIntersections (
+				current,
+				out IntPair indicies,
+				out bool isParallel,
+				start: otherIndex
+			);
+
+			if (!intersection1.isNan) {
+
+				otherIndex = indicies.one;
+
+				if (intersection1 != current.tail) {
+
+					intersections.Enqueue (intersection1);
+					vertexIndicies.Enqueue (new IntPair (next, other.GetNextIndex (otherIndex)));
+
+				}
+
+				if (!intersection2.isNan) {
+
+					intersections.Enqueue (intersection2);
+
+					vertexIndicies.Enqueue (
+						(isParallel && (indicies.two == Line2DSegment.PARALLEL_OTHER))
+						? new IntPair (this.GetNextIndex (next), -1)
+						: new IntPair (-1, other.GetNextIndex (otherIndex))
+					);
+
+				}
+			}
+
+			index = next;
+
+		} while (index != 0);
+
+		if (intersections.Count > 0) {
+
+			var firstIndicies = vertexIndicies.Peek ();
+
+			while (intersections.Count > 0) {
+
+				var intersection = intersections.Dequeue ();
+				overlap.Add (intersection);
+
+				var indicies = vertexIndicies.Dequeue ();
+				var notSkipped = true;
+
+				if (!this.AddRangeOfPointsToList (
+					overlap,
+					indicies.one,
+					(
+						vertexIndicies.Count > 0
+						? vertexIndicies.Peek ().one
+						: firstIndicies.one
+					),
+					SkipCondition: p => {
+
+						notSkipped &= (p == intersection);
+						return notSkipped;
+
+					},
+					StartCondition: p => other.IsContainingPoint (p)
+				)) {
+
+					notSkipped = true;
+
+					other.AddRangeOfPointsToList (
+						overlap,
+						indicies.two,
+						(
+							vertexIndicies.Count > 0
+							? vertexIndicies.Peek ().two
+							: firstIndicies.two
+						),
+						SkipCondition: p => {
+
+							notSkipped &= (p == intersection);
+							return notSkipped;
+
+						},
+						StartCondition: p => this.IsContainingPoint (p)
+					);
+
+				}
+			}
+
+		} else {
+
+			overlap = (
+				this.IsContainingPoint (other[0])
+				? new List<pair2f> (other.verticies)
+				: new List<pair2f> (this.verticies)
+			);
+
+		}
+
+		return new ConvexPolygon2D (ref overlap, qualifyOverlapImmediately);
+
+	}
+}
+
+public delegate bool DPointConditional (pair2f point);
+
+public abstract class APolygon2D : IPolygon2D {
+
+	protected ReadOnlyCollection<pair2f> verticies;
+
+	public virtual pair2f center => SShapeMath.GetCenter (new List<pair2f> (this.verticies));
+	public virtual bool isConvex => SShapeMath.IsConvex (this.verticies);
+	public int count => this.verticies.Count;
+
+	public pair2f this [int index] => verticies[index];
+	public Line2DSegment this [IntPair indicies] => this[indicies.one, indicies.two];
+	public virtual Line2DSegment this [int one, int two] => new Line2DSegment (
+		verticies[one],
+		verticies[two]
+	);
+
+	protected APolygon2D () => this.verticies = null;
+	
+	public APolygon2D (IEnumerable<pair2f> verticies) {
+
+		this.verticies = new ReadOnlyCollection<pair2f> (new List<pair2f> (verticies));
+
+	}
+
+	public APolygon2D (ref List<pair2f> input) {
+
+		this.verticies = new ReadOnlyCollection<pair2f> (input);
+		input = null;
+
+	}
+
+	public APolygon2D (ref ReadOnlyCollection<pair2f> input) {
+
+		this.verticies = input;
+		input = null;
+
+	}
+
+	public abstract bool IsContainingPoint (pair2f point);
+
+	public bool IsIndexValid (int index) => ((index >= 0) && (index < this.count));
+
+	public int GetNextIndex (int index) => (((index + 1) < this.verticies.Count) ? (index + 1) : 0);
+
+	public int GetPreviousIndex (int index) => ((index == 0) ? (this.verticies.Count - 1) : (index - 1));
+
+	public Line2DSegment GetSegment (int index) => this[index, this.GetNextIndex (index)];
+
+	public List<pair2f> CreateVertexList () => new List<pair2f> (verticies);
+
+	public virtual List<Line2D> CreateLineList () {
+
+		var lines = new List<Line2D> ();
+
+		int i;
+		for (i = 1; i < verticies.Count; i++) {
+
+			lines.Add (new Line2D (verticies[i - 1], verticies[i]));
+
+		}
+		lines.Add (new Line2D (verticies[i - 1], verticies[0]));
+
+		return lines;
+
+	}
+
+	List<ICurve2D> IShape2D.CreateCurveList () {
+
+		var curves = new List<ICurve2D> ();
+		var lines = this.CreateLineList ();
+
+		for (int i = 0; i < lines.Count; i++) {
+
+			curves.Add (lines[i] as ICurve2D);
+
+		}
+
+		return curves;
+
+	}
+
+	public virtual List<Line2DSegment> CreateLineSegmentList () {
+
+		var segments = new List<Line2DSegment> ();
+
+		int i;
+		for (i = 1; i < verticies.Count; i++) {
+
+			segments.Add (new Line2DSegment (verticies[i - 1], verticies[i]));
+
+		}
+		segments.Add (new Line2DSegment (verticies[i - 1], verticies[0]));
+
+		return segments;
+
+	}
+
+	List<ICurve2DSegment> IShape2D.CreateCurveSegmentList () {
+
+		var csegments = new List<ICurve2DSegment> ();
+		var lsegments = this.CreateLineSegmentList ();
+
+		for (int i = 0; i < lsegments.Count; i++) {
+
+			csegments.Add (lsegments[i] as ICurve2DSegment);
+
+		}
+
+		return csegments;
+
+	}
+
+	public virtual List<IntPair> CreateLineSegmentIndexList () {
+
+		var indicies = new List<IntPair> ();
+
+		int i;
+		for (i = 1; i < verticies.Count; i++) {
+
+			indicies.Add (new IntPair ((i - 1), i));
+
+		}
+		indicies.Add (new IntPair ((i - 1), 0));
+
+		return indicies;
+
+	}
+
+	public virtual List<pair2f> GetRangeOfPoints (int start, int end, List<pair2f> pointList = null) {
+
+		if (pointList == null) {
+
+			pointList = new List<pair2f> ();
+
+		}
+
+		for (int i = start; i != end; i = this.GetNextIndex (i)) {
+
+			pointList.Add (verticies[i]);
+
+		}
+
+		return pointList;
+
+	}
+
+	public virtual bool AddRangeOfPointsToList (
+		List<pair2f> list,
+		int start,
+		int end,
+		DPointConditional SkipCondition = null,
+		DPointConditional StartCondition = null,
+		DPointConditional ExitCondition = null
+	) {
+
+		var success = false;
+
+		bool IsInRange (int i) => (i != end);
+
+		SkipCondition = (SkipCondition ?? delegate (pair2f p) { return false; });
+		StartCondition = (StartCondition ?? delegate (pair2f p) { return true; });
+		ExitCondition = (ExitCondition ?? delegate (pair2f p) { return false; });
+
+		if (this.IsIndexValid (start) && this.IsIndexValid (end)) {
+
+			var index = start;
+
+			while (IsInRange (index) && SkipCondition (this[index])) {
+
+				index = this.GetNextIndex (index);
+
+			}
+
+			if (IsInRange (index) && StartCondition (this[index])) {
+
+				success = true;
+
+				while (IsInRange (index) && !ExitCondition (this[index])) {
+
+					if (!SkipCondition (this[index])) {
+
+						list.Add (this[index]);
+
+					}
+
+					index = this.GetNextIndex (index);
+
+				}
+			}
+		}
+
+		return success;
+
+	}
+}
+
+public enum EQuadrant {
+
+	PositivePositive = 1,
+	NegativePositive = 2,
+	NegativeNegative = 3,
+	PositiveNegative = 4,
+	PP = PositivePositive,
+	NP = NegativePositive,
+	NN = NegativeNegative,
+	PN = PositiveNegative
+
+}
+
+public static class SIntExtensions {
+
+	public static bool IsEven (this int i) {
+
+		return ((i % 2) == 0);
+
+	}
+
+	public static bool IsOdd (this int i) {
+
+		return ((i % 2) == 1);
+
+	}
+}
+
+public static partial class SFloatMath {
+
+	public static float GetCrossProduct (pair2f p, pair2f q) {
+
+		return GetDeterminant (p, q);
+
+	}
+
+	public static float GetDeterminant (pair2f p, pair2f q) {
+
+		return (
+			(p.x * q.y)
+			- (q.x * p.y)
+		);
+
+	}
+
+	public static float GetDeterminant (float[,] matrix) {
+
+		float determinant = 0f;
+		int length = matrix.GetLength (0);
+
+		float subdeterminant;
+		int rowIndex, colIndex;
+
+		for (int i = 0; i < length; i++) {
+
+			subdeterminant = 1f;
+			rowIndex = 0;
+			colIndex = i;
+
+			while (rowIndex < length) {
+
+				subdeterminant *= matrix[rowIndex, colIndex];
+
+				rowIndex++;
+				colIndex++;
+				colIndex = (
+					(colIndex < length)
+					? colIndex
+					: 0
+				);
+
+			}
+
+			if (i.IsEven ()) {
+
+				determinant += subdeterminant;
+
+			} else {
+
+				determinant -= subdeterminant;
+
+			}
+
+			subdeterminant = 1f;
+			rowIndex--;
+			colIndex--;
+			colIndex = (
+				(colIndex >= 0)
+				? colIndex
+				: (length - 1)
+			);
+
+			while (rowIndex >= 0) {
+
+				subdeterminant *= matrix[rowIndex, colIndex];
+
+				rowIndex--;
+				colIndex++;
+				colIndex = (
+					(colIndex < length)
+					? colIndex
+					: 0
+				);
+
+			}
+
+			if (i.IsEven ()) {
+
+				determinant -= subdeterminant;
+
+			} else {
+
+				determinant += subdeterminant;
+
+			}
+		}
+
+		return determinant;
+
+	}
+}
+
+public static partial class SFloatMath {
+
+	public const float MINIMUM_ORIENTATION = 0.01f;
+	public const int MINIMUM_VERTEX_COUNT = 3;
+	public const int ORIENT_CLOCK = 1;
+	public const int ORIENT_COUNTER = -1;
+	public const int ORIENT_LINEAR = 0;
+
+	/*
+         A positive number indicates a clockwise orientation.
+         A negative number indicates a counter-clockwise orientation.
+         Zero indicates the points are colinear.
+         */
+	public static float GetOrientation (pair2f start, pair2f mid, pair2f end) {
+
+		var endSlope = (end - mid);
+		var startSlope = (mid - start);
+
+		return GetDeterminant (endSlope, startSlope);
+
+	}
+
+	/*
+         ORIENT_CLOCK indicates a clockwise orientation.
+         ORIENT_COUNTER indicates a counter-clockwise orientation.
+         ORIENT_LINEAR the points are colinear.
+         */
+	public static int GetOrientation (
+		pair2f start,
+		pair2f mid,
+		pair2f end,
+		bool isUsingMinimumValue,
+		float minimumAbsoluteValue = MINIMUM_ORIENTATION
+	) {
+
+		return GetSign (
+			GetOrientation (start, mid, end),
+			isUsingMinimumValue,
+			minimumAbsoluteValue
+		);
+
+	}
+
+	public static float GetDistanceFromPointToLine (
+		pair2f point,
+		pair2f linePoint1,
+		pair2f linePoint2
+	) {
+
+		float distance = 0f;
+		float xdiff = (linePoint2.x - linePoint1.x);
+		float ydiff = (linePoint2.y - linePoint1.y);
+
+		if (xdiff == 0f) {
+
+			distance = Math.Abs (point.x - linePoint1.x);
+
+		} else if (ydiff == 0f) {
+
+			distance = Math.Abs (point.y - linePoint1.y);
+
+		} else {
+
+			float slope = (ydiff / xdiff);
+
+			float numerator = Math.Abs (
+				(slope * (point.x - linePoint1.x))
+				- (point.y - linePoint1.y)
+			);
+
+			float denominator = GetSquareRoot (
+				(slope * slope) + 1f
+			);
+
+			distance = (numerator / denominator);
+
+		}
+
+		return distance;
+
+	}
+
+	public static bool IsLineIntersectingAnother (
+		pair2f line1point1,
+		pair2f line1point2,
+		pair2f line2point1,
+		pair2f line2point2
+	) {
+
+		var diff1 = (line1point2 - line1point1);
+		var diff2 = (line2point2 - line2point1);
+		float mult1 = (diff1.y * diff2.x);
+		float mult2 = (diff2.y * diff1.x);
+
+		return !IsFloatNegligible (mult1 - mult2);
+
+	}
+
+	public static bool IsLineSegmentIntersectingAnother (
+		pair2f line1point1,
+		pair2f line1point2,
+		pair2f line2point1,
+		pair2f line2point2,
+		bool disallowParallel = true,
+		bool isIntersectionLenient = false,
+		float tolerance = MINIMUM_ORIENTATION
+	) {
+
+		var isIntersecting = false;
+
+		int orientation1a = GetOrientation (
+			line2point1,
+			line1point1,
+			line1point2,
+			isIntersectionLenient,
+			tolerance
+		);
+
+		isIntersecting = (orientation1a == 0);
+
+		if (!isIntersecting || disallowParallel) {
+
+			int orientation1b = GetOrientation (
+				line2point2,
+				line1point1,
+				line1point2,
+				isIntersectionLenient,
+				tolerance
+			);
+
+			if (orientation1a != orientation1b) {
+
+				int orientation2a = GetOrientation (
+					line1point1,
+					line2point1,
+					line2point2,
+					isIntersectionLenient,
+					tolerance
+				);
+
+				isIntersecting = (orientation2a == 0);
+
+				if (!isIntersecting) {
+
+					int orientation2b = GetOrientation (
+						line1point2,
+						line2point1,
+						line2point2,
+						isIntersectionLenient,
+						tolerance
+					);
+
+					isIntersecting = (orientation2a != orientation2b);
+
+				}
+
+			} else if (disallowParallel) {
+
+				isIntersecting = false;
+
+			}
+		}
+
+		return isIntersecting;
+
+	}
+
+	public static pair2f GetBezierPoint (float interpolation, params pair2f[] curve) {
+
+		var result = pair2f.origin;
+		int length = curve.Length;
+
+		if (length > 0) {
+
+			while (length > 1) {
+
+				for (int i = 1; i < length; i++) {
+
+					pair2f previous = curve[i - 1];
+					pair2f current = curve[i];
+					pair2f diff = (current - previous);
+					curve[i - 1] = (previous + (diff * interpolation));
+
+				}
+
+				length--;
+
+			}
+
+			result = curve[0];
+
+		}
+
+		return result;
+
+	}
+
+	public static pair2f GetBezierPoint (float interpolation, List<pair2f> curve) {
+
+		var result = pair2f.origin;
+		int length = curve.Count;
+
+		if (length > 0) {
+
+			while (length > 1) {
+
+				for (int i = 1; i < length; i++) {
+
+					pair2f previous = curve[i - 1];
+					pair2f current = curve[i];
+					pair2f diff = (current - previous);
+					curve[i - 1] = (previous + (diff * interpolation));
+
+				}
+
+				length--;
+
+			}
+
+			result = curve[0];
+
+		}
+
+		return result;
+
+	}
+
+	public static pair2f GetFurthestPointInDirection (pair2f[] points, pair2f direction) {
+
+		pair2f furthest = pair2f.origin;
+		float distance = float.NaN;
+
+		for (int i = 0; i < points.Length; i++) {
+
+			float current = (
+				(points[i].x * direction.x)
+				+ (points[i].y * direction.y)
+			);
+
+			if (!(current <= distance)) {
+
+				furthest = points[i];
+				distance = current;
+
+			}
+		}
+
+		return furthest;
+
+	}
+
+	public static pair2f GetFurthestPointInDirection (List<pair2f> points, pair2f direction) {
+
+		pair2f furthest = pair2f.origin;
+		float distance = float.NaN;
+
+		for (int i = 0; i < points.Count; i++) {
+
+			float current = (
+				(points[i].x * direction.x)
+				+ (points[i].y * direction.y)
+			);
+
+			if (!(current <= distance)) {
+
+				furthest = points[i];
+				distance = current;
+
+			}
+		}
+
+		return furthest;
+
+	}
+
+	public static pair2f GetFurthestPointInDirection (IEnumerable<pair2f> points, pair2f direction) {
+
+		pair2f furthest = pair2f.origin;
+		float distance = float.NaN;
+
+		foreach (pair2f point in points) {
+
+			float current = (
+				(point.x * direction.x)
+				+ (point.y * direction.y)
+			);
+
+			if (!(current <= distance)) {
+
+				furthest = point;
+				distance = current;
+
+			}
+		}
+
+		return furthest;
+
+	}
+
+	public static EQuadrant GetQuadrantOfPoint (pair2f point) {
+
+		EQuadrant quad;
+
+		if (point.x < 0f) {
+
+			if (point.y < 0f) {
+
+				quad = EQuadrant.NegativeNegative;
+
+			} else {
+
+				quad = EQuadrant.NegativePositive;
+
+			}
+
+		} else if (point.y < 0f) {
+
+			quad = EQuadrant.PositiveNegative;
+
+		} else {
+
+			quad = EQuadrant.PositivePositive;
+
+		}
+
+		return quad;
+
+	}
+
+	/// This function returns the normal vector that's clockwise to the given points.
+	public static pair2f GetNormalComponents (pair2f head, pair2f tail) {
+
+		return new pair2f (
+			(head.y - tail.y),
+			(tail.x - head.x)
+		);
+
+	}
+
+	public static pair2f GetIntersectionOfLineSegments (
+		pair2f line1point1,
+		pair2f line1point2,
+		pair2f line2point1,
+		pair2f line2point2
+	) {
+
+		var intersection = pair2f.nan;
+
+		var slope1 = (line1point1 - line1point2);
+		var slope2 = (line2point1 - line2point2);
+		float x1diff = (line1point1.x - line2point1.x);
+		float y1diff = (line1point1.y - line2point1.y);
+
+		float denominator = ((slope1.x * slope2.y) - (slope1.y * slope2.x));
+		float interpolation1 = (((slope2.y * x1diff) - (slope2.x * y1diff)) / denominator);
+
+		if ((interpolation1 >= 0f) && (interpolation1 <= 1f)) {
+
+			float interpolation2 = (((slope1.y * x1diff) - (slope1.x * y1diff)) / denominator);
+
+			if ((interpolation2 >= 0f) && (interpolation2 <= 1f)) {
+
+				intersection = (
+					line1point1 + (
+						(
+							line1point2
+							- line1point1
+						) * interpolation1
+					)
+				);
+
+			}
+		}
+
+		return intersection;
+
+	}
+}
+
+public static partial class SShapeMath {
+
+	public static bool IsPointInConvexShape (pair2f point, params pair2f[] shape) {
+
+		return IsPointInConvexShape (point, shape, false);
+
+	}
+
+	public static bool IsPointInConvexShape (pair2f point, bool allowBoundary, params pair2f[] shape) {
+
+		return IsPointInConvexShape (point, shape, allowBoundary);
+
+	}
+
+	public static bool IsPointInConvexShape (pair2f point, bool allowBoundary, float tolerance, params pair2f[] shape) {
+
+		return IsPointInConvexShape (point, shape, allowBoundary, tolerance);
+
+	}
+
+	public static bool IsPointInConvexShape (
+		pair2f point,
+		pair2f[] shape,
+		bool allowBoundary = true,
+		float tolerance = SFloatMath.MINIMUM_ORIENTATION
+	) {
+
+		var isPointInShape = false;
+
+		int length = shape.Length;
+		var isShapeValid = (length >= 3);
+		var previousVertex = shape[length - 1];
+
+		if (isShapeValid) {
+
+			int orientation, previousOrientation = SFloatMath.ORIENT_LINEAR;
+			var isComparingOrientations = false;
+
+			for (int i = 0; i < length; i++) {
+
+				orientation = SFloatMath.GetOrientation (
+					point,
+					previousVertex,
+					shape[i],
+					allowBoundary,
+					tolerance
+				);
+
+				if (orientation == 0) {
+
+					isPointInShape = allowBoundary;
+					break;
+
+				}
+
+				if (isComparingOrientations) {
+
+					isPointInShape = (orientation == previousOrientation);
+
+					if (!isPointInShape) {
+
+						break;
+
+					}
+				}
+
+				previousOrientation = orientation;
+				previousVertex = shape[i];
+				isComparingOrientations = true;
+
+			}
+		}
+
+		return (isShapeValid && isPointInShape);
+
+	}
+
+	public static bool IsPointInConvexShape (
+		pair2f point,
+		List<pair2f> shape,
+		bool allowBoundary = true,
+		float tolerance = SFloatMath.MINIMUM_ORIENTATION
+	) {
+
+		var isPointInShape = false;
+
+		int length = shape.Count;
+		var isShapeValid = (length >= 3);
+		var previousVertex = shape[length - 1];
+
+		if (isShapeValid) {
+
+			int orientation;
+			int? previousOrientation = null;
+
+			for (int i = 0; i < length; i++) {
+
+				orientation = SFloatMath.GetOrientation (
+					point,
+					previousVertex,
+					shape[i],
+					allowBoundary,
+					tolerance
+				);
+
+				if (!allowBoundary && (orientation == 0)) {
+
+					isPointInShape = false;
+					break;
+
+				}
+
+				if (previousOrientation.HasValue) {
+
+					isPointInShape = (orientation == previousOrientation.Value);
+
+					if (!isPointInShape) {
+
+						break;
+
+					}
+				}
+
+				previousOrientation = orientation;
+				previousVertex = shape[i];
+
+			}
+		}
+
+		return (isShapeValid && isPointInShape);
+
+	}
+}

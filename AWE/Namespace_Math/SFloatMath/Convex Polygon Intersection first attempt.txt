@@ -1,0 +1,168 @@
+        public static List<pair2f> GetIntersectionOfConvexPolygons (
+            List<pair2f> shape1,
+            List<pair2f> shape2
+        ) {
+
+            var intersection = new List<pair2f> ();
+
+            var shape1points = new Queue<pair2f> ();
+            var shape1postpoints = new Queue<pair2f> ();
+            var lineIntersection1 = (
+                line1point1: pair2f.origin,
+                line1point2: pair2f.origin,
+                line2point1: pair2f.origin,
+                line2point2: pair2f.origin
+            );
+            var shape2points = new Queue<pair2f> ();
+            var shape2postpoints = new Queue<pair2f> ();
+            var lineIntersection2 = (
+                line1point1: pair2f.origin,
+                line1point2: pair2f.origin,
+                line2point1: pair2f.origin,
+                line2point2: pair2f.origin
+            );
+
+            Queue<pair2f> currentQueue = null;
+
+            for (int i = 0; i < shape1.Count; i++) {
+
+                if (IsPointInConvexShape (shape1[i], shape2)) {
+
+                    if (currentQueue == null) {
+
+                        if (i > 0) {
+
+                            lineIntersection2.line1point1 = shape1[i];
+                            lineIntersection2.line1point2 = shape1[i - 1];
+
+                            currentQueue = shape1points;
+
+                        } else {
+
+                            currentQueue = shape1postpoints;
+
+                        }
+                    }
+
+                    currentQueue.Enqueue (shape1[i]);
+
+                } else {
+
+                    if (currentQueue != null) {
+
+                        lineIntersection1.line1point1 = shape1[i];
+                        lineIntersection1.line1point2 = shape1[i - 1];
+
+                        currentQueue = null;
+
+                    }
+
+                    if ((i == (shape1.Count - 1))
+                        && (shape1postpoints.Count > 0)
+                    ) {
+
+                        lineIntersection2.line1point1 = shape1[0];
+                        lineIntersection2.line1point2 = shape1[i];
+
+                    }
+                }
+            }
+
+            for (int i = 0; i < shape2.Count; i++) {
+
+                if (IsPointInConvexShape (shape2[i], shape1)) {
+
+                    if (currentQueue == null) {
+
+                        if (i > 0) {
+
+                            lineIntersection2.line2point1 = shape2[i];
+                            lineIntersection2.line2point2 = shape2[i - 1];
+
+                            currentQueue = shape2points;
+
+                        } else {
+
+                            currentQueue = shape2postpoints;
+
+                        }
+                    }
+
+                    currentQueue.Enqueue (shape2[i]);
+
+                } else {
+
+                    if (currentQueue != null) {
+
+                        lineIntersection1.line2point1 = shape2[i];
+                        lineIntersection1.line2point2 = shape2[i - 1];
+
+                        currentQueue = null;
+
+                    }
+
+                    if ((i == (shape2.Count - 1))
+                        && (shape2postpoints.Count > 0)
+                    ) {
+
+                        lineIntersection2.line2point1 = shape2[0];
+                        lineIntersection2.line2point2 = shape2[i];
+
+                    }
+                }
+            }
+
+            /*
+             TODO
+
+             Account for the following cases:
+
+                * One of the shapes is entirely in the other
+                    -> "if (shape1postpoints.Count == shape1.Count)", etc.
+
+                * Neither of the shapes' verticies are in the other, but they do have intersecting line segments
+
+                * One of the shapes does have verticies in the other, but the other doesn't
+             */
+
+            while (shape1points.Count > 0) {
+
+                intersection.Add (shape1points.Dequeue ());
+
+            }
+
+            while (shape1postpoints.Count > 0) {
+
+                intersection.Add (shape1postpoints.Dequeue ());
+
+            }
+
+            intersection.Add (GetIntersectionOfLineSegments (
+                lineIntersection1.line1point1,
+                lineIntersection1.line1point2,
+                lineIntersection1.line2point1,
+                lineIntersection1.line2point2
+            ).Value);
+
+            while (shape2points.Count > 0) {
+
+                intersection.Add (shape2points.Dequeue ());
+
+            }
+
+            while (shape2postpoints.Count > 0) {
+
+                intersection.Add (shape2postpoints.Dequeue ());
+
+            }
+
+            intersection.Add (GetIntersectionOfLineSegments (
+                lineIntersection2.line1point1,
+                lineIntersection2.line1point2,
+                lineIntersection2.line2point1,
+                lineIntersection2.line2point2
+            ).Value);
+
+            return intersection;
+
+        }

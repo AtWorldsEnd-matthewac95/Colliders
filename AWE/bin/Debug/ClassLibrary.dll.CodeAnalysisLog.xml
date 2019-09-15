@@ -1,0 +1,707 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="c:\program files (x86)\microsoft visual studio\2019\community\team tools\static analysis tools\fxcop\Xml\CodeAnalysisReport.xsl"?>
+<FxCopReport Version="16.0">
+ <Targets>
+  <Target Name="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\bin\Debug\ClassLibrary.dll">
+   <Modules>
+    <Module Name="classlibrary.dll">
+     <Messages>
+      <Message TypeName="MarkAssembliesWithAssemblyVersion" Category="Microsoft.Design" CheckId="CA1016" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+       <Issue Certainty="95" Level="Error">Add an AssemblyVersion attribute to 'ClassLibrary.dll'.</Issue>
+      </Message>
+     </Messages>
+     <Namespaces>
+      <Namespace Name="AWE">
+       <Types>
+        <Type Name="CyclicCollectionIterator`1" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#.ctor(System.Collections.ObjectModel.ReadOnlyCollection`1&lt;!0&gt;,System.Int32,System.Int32)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="CriticalWarning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Cyclic Iterators" File="CyclicCollectionIterator.cs" Line="28">'CyclicCollectionIterator&lt;T&gt;.CyclicCollectionIterator(ReadOnlyCollection&lt;T&gt;, int, int)' contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: &#xD;&#xA;&#xD;&#xA;CyclicCollectionIterator&lt;T&gt;..ctor(ReadOnlyCollection&lt;T&gt;, Int32, Int32)&#xD;&#xA;ACyclicIndexIterator&lt;T&gt;.set_currentIndex(Int32):Void&#xD;&#xA;ACyclicIndexIterator&lt;T&gt;.set_cycles(Int32):Void</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="CyclicDelegateIterator`1" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#.ctor(System.Func`2&lt;System.Int32,!0&gt;,System.Func`1&lt;System.Int32&gt;,System.Int32,System.Int32)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="CriticalWarning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Cyclic Iterators" File="CyclicDelegateIterator.cs" Line="29">'CyclicDelegateIterator&lt;T&gt;.CyclicDelegateIterator(Func&lt;int, T&gt;, Func&lt;int&gt;, int, int)' contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: &#xD;&#xA;&#xD;&#xA;CyclicDelegateIterator&lt;T&gt;..ctor(Func&lt;Int32,T&gt;, Func&lt;Int32&gt;, Int32, Int32)&#xD;&#xA;ACyclicIndexIterator&lt;T&gt;.set_currentIndex(Int32):Void&#xD;&#xA;ACyclicIndexIterator&lt;T&gt;.set_cycles(Int32):Void</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="IntPair" Kind="Struct" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#.cctor()" Kind="Method" Static="True" Accessibility="Private" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="InitializeValueTypeStaticFieldsInline" Category="Microsoft.Usage" CheckId="CA2207" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="CriticalError" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE" File="IntPair.cs" Line="11">Initialize all static fields in 'IntPair' when those fields are declared and remove the explicit static constructor.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#Item[System.Int32]" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#get_Item(System.Int32)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="DoNotRaiseExceptionsInUnexpectedLocations" Category="Microsoft.Design" CheckId="CA1065" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="Breaking">
+               <Issue Name="PropertyGetter" Certainty="90" Level="Warning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE" File="IntPair.cs" Line="41">'IntPair.this.get(int)' creates an exception of type 'IndexOutOfRangeException', an exception type that should not be raised in a property. If this exception instance might be raised, use a different exception type, convert this property into a method, or change this property's logic so that it no longer raises an exception.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="LinkedListNode`1" Kind="Class" Accessibility="Assembly" ExternallyVisible="False">
+         <Members>
+          <Member Name="#.ctor(AWE.LinkedList`1&lt;!0&gt;,!0)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="CriticalWarning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\LinkedList" File="LinkedListNode.cs" Line="15">'LinkedListNode&lt;T&gt;.LinkedListNode(LinkedList&lt;T&gt;, T)' contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: &#xD;&#xA;&#xD;&#xA;LinkedListNode&lt;T&gt;..ctor(LinkedList&lt;T&gt;, T)&#xD;&#xA;LinkedListNode&lt;T&gt;.set_next(LinkedListNode&lt;T&gt;):Void</Issue>
+             <Issue Certainty="95" Level="CriticalWarning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\LinkedList" File="LinkedListNode.cs" Line="15">'LinkedListNode&lt;T&gt;.LinkedListNode(LinkedList&lt;T&gt;, T)' contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: &#xD;&#xA;&#xD;&#xA;LinkedListNode&lt;T&gt;..ctor(LinkedList&lt;T&gt;, T)&#xD;&#xA;LinkedListNode&lt;T&gt;.set_previous(LinkedListNode&lt;T&gt;):Void</Issue>
+             <Issue Certainty="95" Level="CriticalWarning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\LinkedList" File="LinkedListNode.cs" Line="15">'LinkedListNode&lt;T&gt;.LinkedListNode(LinkedList&lt;T&gt;, T)' contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: &#xD;&#xA;&#xD;&#xA;LinkedListNode&lt;T&gt;..ctor(LinkedList&lt;T&gt;, T)&#xD;&#xA;LinkedListNode&lt;T&gt;.set_value(T):Void</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#.ctor(AWE.LinkedList`1&lt;!0&gt;,!0,AWE.LinkedListNode`1&lt;!0&gt;,AWE.LinkedListNode`1&lt;!0&gt;)" Kind="Method" Static="False" Accessibility="Assembly" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="CriticalWarning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\LinkedList" File="LinkedListNode.cs" Line="24">'LinkedListNode&lt;T&gt;.LinkedListNode(LinkedList&lt;T&gt;, T, LinkedListNode&lt;T&gt;, LinkedListNode&lt;T&gt;)' contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: &#xD;&#xA;&#xD;&#xA;LinkedListNode&lt;T&gt;..ctor(LinkedList&lt;T&gt;, T, LinkedListNode&lt;T&gt;, LinkedListNode&lt;T&gt;)&#xD;&#xA;LinkedListNode&lt;T&gt;.SetNext(LinkedListNode&lt;T&gt;):Void&#xD;&#xA;LinkedListNode&lt;T&gt;.SetNext(LinkedListNode&lt;T&gt;, Boolean&amp;):Void&#xD;&#xA;LinkedListNode&lt;T&gt;.AddNext(LinkedListNode&lt;T&gt;, Boolean&amp;):Void&#xD;&#xA;LinkedListNode&lt;T&gt;.set_next(LinkedListNode&lt;T&gt;):Void</Issue>
+             <Issue Certainty="95" Level="CriticalWarning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\LinkedList" File="LinkedListNode.cs" Line="24">'LinkedListNode&lt;T&gt;.LinkedListNode(LinkedList&lt;T&gt;, T, LinkedListNode&lt;T&gt;, LinkedListNode&lt;T&gt;)' contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: &#xD;&#xA;&#xD;&#xA;LinkedListNode&lt;T&gt;..ctor(LinkedList&lt;T&gt;, T, LinkedListNode&lt;T&gt;, LinkedListNode&lt;T&gt;)&#xD;&#xA;LinkedListNode&lt;T&gt;.SetNext(LinkedListNode&lt;T&gt;):Void&#xD;&#xA;LinkedListNode&lt;T&gt;.SetNext(LinkedListNode&lt;T&gt;, Boolean&amp;):Void&#xD;&#xA;LinkedListNode&lt;T&gt;.get_next():LinkedListNode&lt;T&gt;</Issue>
+             <Issue Certainty="95" Level="CriticalWarning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\LinkedList" File="LinkedListNode.cs" Line="24">'LinkedListNode&lt;T&gt;.LinkedListNode(LinkedList&lt;T&gt;, T, LinkedListNode&lt;T&gt;, LinkedListNode&lt;T&gt;)' contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: &#xD;&#xA;&#xD;&#xA;LinkedListNode&lt;T&gt;..ctor(LinkedList&lt;T&gt;, T, LinkedListNode&lt;T&gt;, LinkedListNode&lt;T&gt;)&#xD;&#xA;LinkedListNode&lt;T&gt;.SetPrevious(LinkedListNode&lt;T&gt;):Void&#xD;&#xA;LinkedListNode&lt;T&gt;.SetPrevious(LinkedListNode&lt;T&gt;, Boolean&amp;):Void&#xD;&#xA;LinkedListNode&lt;T&gt;.AddPrevious(LinkedListNode&lt;T&gt;, Boolean&amp;):Void&#xD;&#xA;LinkedListNode&lt;T&gt;.set_previous(LinkedListNode&lt;T&gt;):Void</Issue>
+             <Issue Certainty="95" Level="CriticalWarning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\LinkedList" File="LinkedListNode.cs" Line="24">'LinkedListNode&lt;T&gt;.LinkedListNode(LinkedList&lt;T&gt;, T, LinkedListNode&lt;T&gt;, LinkedListNode&lt;T&gt;)' contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: &#xD;&#xA;&#xD;&#xA;LinkedListNode&lt;T&gt;..ctor(LinkedList&lt;T&gt;, T, LinkedListNode&lt;T&gt;, LinkedListNode&lt;T&gt;)&#xD;&#xA;LinkedListNode&lt;T&gt;.SetPrevious(LinkedListNode&lt;T&gt;):Void&#xD;&#xA;LinkedListNode&lt;T&gt;.SetPrevious(LinkedListNode&lt;T&gt;, Boolean&amp;):Void&#xD;&#xA;LinkedListNode&lt;T&gt;.get_previous():LinkedListNode&lt;T&gt;</Issue>
+             <Issue Certainty="95" Level="CriticalWarning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\LinkedList" File="LinkedListNode.cs" Line="24">'LinkedListNode&lt;T&gt;.LinkedListNode(LinkedList&lt;T&gt;, T, LinkedListNode&lt;T&gt;, LinkedListNode&lt;T&gt;)' contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: &#xD;&#xA;&#xD;&#xA;LinkedListNode&lt;T&gt;..ctor(LinkedList&lt;T&gt;, T, LinkedListNode&lt;T&gt;, LinkedListNode&lt;T&gt;)&#xD;&#xA;LinkedListNode&lt;T&gt;.set_value(T):Void</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Pair`1" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#Item[System.Int32]" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#get_Item(System.Int32)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="DoNotRaiseExceptionsInUnexpectedLocations" Category="Microsoft.Design" CheckId="CA1065" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="Breaking">
+               <Issue Name="PropertyGetter" Certainty="90" Level="Warning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE" File="Pair.cs" Line="30">'Pair&lt;T&gt;.this.get(int)' creates an exception of type 'IndexOutOfRangeException', an exception type that should not be raised in a property. If this exception instance might be raised, use a different exception type, convert this property into a method, or change this property's logic so that it no longer raises an exception.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#System.Collections.Generic.IReadOnlyCollection`1&lt;!0&gt;.Count" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#System.Collections.Generic.IReadOnlyCollection`1&lt;!0&gt;.get_Count()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE" File="Pair.cs" Line="12">Make 'Pair&lt;T&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IReadOnlyCollection&lt;T&gt;.Count.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+      <Namespace Name="AWE.Math">
+       <Types>
+        <Type Name="APolygon2D" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#AWE.Math.IShape2D.CreateCurveList()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Math\Shapes" File="APolygon2D.cs" Line="58">Make 'APolygon2D' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IShape2D.CreateCurveList()' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.Math.IShape2D.CreateCurveSegmentList()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Math\Shapes" File="APolygon2D.cs" Line="87">Make 'APolygon2D' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IShape2D.CreateCurveSegmentList()' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#System.Collections.Generic.IReadOnlyCollection`1&lt;AWE.Math.pair2f&gt;.Count" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#System.Collections.Generic.IReadOnlyCollection`1&lt;AWE.Math.pair2f&gt;.get_Count()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Math\Shapes" File="APolygon2D.cs" Line="16">Make 'APolygon2D' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IReadOnlyCollection&lt;pair2f&gt;.Count.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Bounds2D" Kind="Struct" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#Equals(System.Object)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="OverloadOperatorEqualsOnOverridingValueTypeEquals" Category="Microsoft.Usage" CheckId="CA2231" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="75" Level="Warning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Math" File="Bounds2D.cs" Line="127">Because 'Bounds2D' is a value type that overrides ValueType.Equals, it should also overload the equality and inequality operators (== and !=).</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Line2D" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#AWE.Math.ICurve2D.IsPointOnCurve(AWE.Math.pair2f)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Math\Shapes" File="Line2D.cs" Line="262">Make 'Line2D' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'ICurve2D.IsPointOnCurve(pair2f)' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Line2DSegment" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#AWE.IPair`1&lt;AWE.Math.pair2f&gt;.first" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#AWE.IPair`1&lt;AWE.Math.pair2f&gt;.get_first()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Math\Shapes" File="Line2DSegment.cs" Line="12">Make 'Line2DSegment' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPair&lt;pair2f&gt;.first.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#AWE.IPair`1&lt;AWE.Math.pair2f&gt;.opposite(System.Int32)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Math\Shapes" File="Line2DSegment.cs" Line="148">Make 'Line2DSegment' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPair&lt;pair2f&gt;.opposite(int)' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.IPair`1&lt;AWE.Math.pair2f&gt;.second" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#AWE.IPair`1&lt;AWE.Math.pair2f&gt;.get_second()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Math\Shapes" File="Line2DSegment.cs" Line="13">Make 'Line2DSegment' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPair&lt;pair2f&gt;.second.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#AWE.Math.ICurve2D.IsPointOnCurve(AWE.Math.pair2f)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Math\Shapes" File="Line2DSegment.cs" Line="144">Make 'Line2DSegment' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'ICurve2D.IsPointOnCurve(pair2f)' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#Item[System.Int32]" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#get_Item(System.Int32)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="DoNotRaiseExceptionsInUnexpectedLocations" Category="Microsoft.Design" CheckId="CA1065" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="Breaking">
+               <Issue Name="PropertyGetter" Certainty="90" Level="Warning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Math\Shapes" File="Line2DSegment.cs" Line="49">'Line2DSegment.this.get(int)' creates an exception of type 'IndexOutOfRangeException', an exception type that should not be raised in a property. If this exception instance might be raised, use a different exception type, convert this property into a method, or change this property's logic so that it no longer raises an exception.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#System.Collections.Generic.IReadOnlyCollection`1&lt;AWE.Math.pair2f&gt;.Count" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#System.Collections.Generic.IReadOnlyCollection`1&lt;AWE.Math.pair2f&gt;.get_Count()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Math\Shapes" File="Line2DSegment.cs" Line="31">Make 'Line2DSegment' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IReadOnlyCollection&lt;pair2f&gt;.Count.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="pair2f" Kind="Struct" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#.cctor()" Kind="Method" Static="True" Accessibility="Private" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="InitializeValueTypeStaticFieldsInline" Category="Microsoft.Usage" CheckId="CA2207" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="CriticalError" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Math" File="pair2f.cs" Line="16">Initialize all static fields in 'pair2f' when those fields are declared and remove the explicit static constructor.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#Item[System.Int32]" Kind="Property" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#get_Item(System.Int32)" Kind="Method" Static="False" Accessibility="Public" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="DoNotRaiseExceptionsInUnexpectedLocations" Category="Microsoft.Design" CheckId="CA1065" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="Breaking">
+               <Issue Name="PropertyGetter" Certainty="90" Level="Warning" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Math" File="pair2f.cs" Line="91">'pair2f.this.get(int)' creates an exception of type 'IndexOutOfRangeException', an exception type that should not be raised in a property. If this exception instance might be raised, use a different exception type, convert this property into a method, or change this property's logic so that it no longer raises an exception.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Vector2D" Kind="Struct" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#.cctor()" Kind="Method" Static="True" Accessibility="Private" ExternallyVisible="False">
+           <Messages>
+            <Message TypeName="InitializeValueTypeStaticFieldsInline" Category="Microsoft.Usage" CheckId="CA2207" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="CriticalError" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Math" File="Vector2D.cs" Line="12">Initialize all static fields in 'Vector2D' when those fields are declared and remove the explicit static constructor.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+      <Namespace Name="AWE.Moving">
+       <Types>
+        <Type Name="ATransform`4" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#AWE.Moving.ITransform.state" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#AWE.Moving.ITransform.get_state()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Transform" File="ATransform.cs" Line="19">Make 'ATransform&lt;TValueType, TTranslation, TRotation, TDilation&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'ITransform.state.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#AWE.Moving.ITransform`1&lt;!0&gt;.state" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#AWE.Moving.ITransform`1&lt;!0&gt;.get_state()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Transform" File="ATransform.cs" Line="20">Make 'ATransform&lt;TValueType, TTranslation, TRotation, TDilation&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'ITransform&lt;TValueType&gt;.state.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#AWE.Moving.ITransform`4&lt;!0,!1,!2,!3&gt;.state" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#AWE.Moving.ITransform`4&lt;!0,!1,!2,!3&gt;.get_state()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Transform" File="ATransform.cs" Line="21">Make 'ATransform&lt;TValueType, TTranslation, TRotation, TDilation&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'ITransform&lt;TValueType, TTranslation, TRotation, TDilation&gt;.state.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+         </Members>
+        </Type>
+       </Types>
+      </Namespace>
+      <Namespace Name="AWE.Moving.Moving2D">
+       <Types>
+        <Type Name="AMovingPolygon2D`1" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#AWE.Math.IPolygon2D.AddRangeOfPointsToList(System.Collections.Generic.List`1&lt;AWE.Math.pair2f&gt;,System.Int32,System.Int32,AWE.Math.DPointConditional,AWE.Math.DPointConditional,AWE.Math.DPointConditional)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="70">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPolygon2D.AddRangeOfPointsToList(List&lt;pair2f&gt;, int, int, DPointConditional, DPointConditional, DPointConditional)' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.Math.IPolygon2D.bounds" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#AWE.Math.IPolygon2D.get_bounds()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="56">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPolygon2D.bounds.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#AWE.Math.IPolygon2D.count" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#AWE.Math.IPolygon2D.get_count()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="58">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPolygon2D.count.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#AWE.Math.IPolygon2D.CreateEdgeIndexList()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="74">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPolygon2D.CreateEdgeIndexList()' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.Math.IPolygon2D.CreateEdgeIterator(System.Int32)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="75">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPolygon2D.CreateEdgeIterator(int)' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.Math.IPolygon2D.CreateEdgeList()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="73">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPolygon2D.CreateEdgeList()' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.Math.IPolygon2D.CreateLineList()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="72">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPolygon2D.CreateLineList()' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.Math.IPolygon2D.CreateVertexIterator(System.Int32)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="76">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPolygon2D.CreateVertexIterator(int)' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.Math.IPolygon2D.GetNextIndex(System.Int32)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="77">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPolygon2D.GetNextIndex(int)' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.Math.IPolygon2D.GetPreviousIndex(System.Int32)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="78">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPolygon2D.GetPreviousIndex(int)' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.Math.IPolygon2D.IsIntersecting(AWE.Math.IPolygon2D)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="79">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPolygon2D.IsIntersecting(IPolygon2D)' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.Math.IPolygon2D.Item[AWE.IntPair]" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#AWE.Math.IPolygon2D.get_Item(AWE.IntPair)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="61">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPolygon2D.this.get(IntPair)' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#AWE.Math.IPolygon2D.Item[System.Int32,System.Int32]" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#AWE.Math.IPolygon2D.get_Item(System.Int32,System.Int32)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="60">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPolygon2D.this.get(int, int)' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#AWE.Math.IPolygon2D.unoffsetVerticies" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#AWE.Math.IPolygon2D.get_unoffsetVerticies()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="57">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IPolygon2D.unoffsetVerticies.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#AWE.Math.IShape2D.center" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#AWE.Math.IShape2D.get_center()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="45">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IShape2D.center.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#AWE.Math.IShape2D.CreateCurveList()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="50">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IShape2D.CreateCurveList()' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.Math.IShape2D.CreateCurveSegmentList()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="51">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IShape2D.CreateCurveSegmentList()' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.Math.IShape2D.CreateVertexList()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="49">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IShape2D.CreateVertexList()' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.Math.IShape2D.IsContainingPoint(AWE.Math.pair2f)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="52">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IShape2D.IsContainingPoint(pair2f)' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#AWE.Math.IShape2D.isConvex" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#AWE.Math.IShape2D.get_isConvex()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="46">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IShape2D.isConvex.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#System.Collections.Generic.IEnumerable`1&lt;AWE.Math.pair2f&gt;.GetEnumerator()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="41">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IEnumerable&lt;pair2f&gt;.GetEnumerator()' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#System.Collections.Generic.IReadOnlyCollection`1&lt;AWE.Math.pair2f&gt;.Count" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#System.Collections.Generic.IReadOnlyCollection`1&lt;AWE.Math.pair2f&gt;.get_Count()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="36">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IReadOnlyCollection&lt;pair2f&gt;.Count.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#System.Collections.Generic.IReadOnlyList`1&lt;AWE.Math.pair2f&gt;.Item[System.Int32]" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#System.Collections.Generic.IReadOnlyList`1&lt;AWE.Math.pair2f&gt;.get_Item(System.Int32)" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="38">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IReadOnlyList&lt;pair2f&gt;.this.get(int)' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+          <Member Name="#System.Collections.IEnumerable.GetEnumerator()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+             <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="AMovingPolygon2D.cs" Line="40">Make 'AMovingPolygon2D&lt;TPolygon2D&gt;' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IEnumerable.GetEnumerator()' and is visible to derived classes.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="ATransform2D" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Messages>
+          <Message TypeName="ComVisibleTypeBaseTypesShouldBeComVisible" Category="Microsoft.Interoperability" CheckId="CA1405" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="DependsOnFix">
+           <Issue Certainty="90" Level="Error">'ATransform2D' is marked ComVisible(true) but has the following ComVisible(false) types in its object hierarchy: 'ATransform&lt;float, pair2f, angle, pair2f&gt;'</Issue>
+          </Message>
+         </Messages>
+        </Type>
+        <Type Name="ITransform2D" Kind="Interface" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#OnAnyChange" Kind="Event" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DeclareEventHandlersCorrectly" Category="Microsoft.Design" CheckId="CA1009" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="Breaking">
+             <Issue Name="First" Certainty="95" Level="Error">Declare the first parameter of 'DTransform2DUpdate' as an object named 'sender'.</Issue>
+             <Issue Name="Second" Certainty="95" Level="Error">Declare the second parameter of 'DTransform2DUpdate' as an EventArgs, or an instance of a type that extends EventArgs, named 'e'.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#OnDilation" Kind="Event" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DeclareEventHandlersCorrectly" Category="Microsoft.Design" CheckId="CA1009" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="Breaking">
+             <Issue Name="First" Certainty="95" Level="Error">Declare the first parameter of 'DTransform2DDilation' as an object named 'sender'.</Issue>
+             <Issue Name="Second" Certainty="95" Level="Error">Declare the second parameter of 'DTransform2DDilation' as an EventArgs, or an instance of a type that extends EventArgs, named 'e'.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#OnRotation" Kind="Event" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DeclareEventHandlersCorrectly" Category="Microsoft.Design" CheckId="CA1009" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="Breaking">
+             <Issue Name="First" Certainty="95" Level="Error">Declare the first parameter of 'DTransform2DRotation' as an object named 'sender'.</Issue>
+             <Issue Name="Second" Certainty="95" Level="Error">Declare the second parameter of 'DTransform2DRotation' as an EventArgs, or an instance of a type that extends EventArgs, named 'e'.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#OnTransformation" Kind="Event" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DeclareEventHandlersCorrectly" Category="Microsoft.Design" CheckId="CA1009" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="Breaking">
+             <Issue Name="First" Certainty="95" Level="Error">Declare the first parameter of 'DTransform2DTransformation' as an object named 'sender'.</Issue>
+             <Issue Name="Second" Certainty="95" Level="Error">Declare the second parameter of 'DTransform2DTransformation' as an EventArgs, or an instance of a type that extends EventArgs, named 'e'.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+          <Member Name="#OnTranslation" Kind="Event" Static="False" Accessibility="Public" ExternallyVisible="True">
+           <Messages>
+            <Message TypeName="DeclareEventHandlersCorrectly" Category="Microsoft.Design" CheckId="CA1009" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="Breaking">
+             <Issue Name="First" Certainty="95" Level="Error">Declare the first parameter of 'DTransform2DTranslation' as an object named 'sender'.</Issue>
+             <Issue Name="Second" Certainty="95" Level="Error">Declare the second parameter of 'DTransform2DTranslation' as an EventArgs, or an instance of a type that extends EventArgs, named 'e'.</Issue>
+            </Message>
+           </Messages>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="MovingShapeBounds2D" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Members>
+          <Member Name="#AWE.IGradient`1&lt;AWE.Moving.Moving2D.TranslatingBounds2D&gt;.current" Kind="Property" Static="False" Accessibility="Private" ExternallyVisible="True">
+           <Accessors>
+            <Accessor Name="#AWE.IGradient`1&lt;AWE.Moving.Moving2D.TranslatingBounds2D&gt;.get_current()" Kind="Method" Static="False" Accessibility="Private" ExternallyVisible="True">
+             <Messages>
+              <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="NonBreaking">
+               <Issue Certainty="95" Level="Error" Path="C:\Users\Matthew\Documents\Code\Movement\awe-csharp-libs\AWE\Namespace_Moving\Namespace_Moving2d" File="MovingShapeBounds2D.cs" Line="28">Make 'MovingShapeBounds2D' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of 'IGradient&lt;TranslatingBounds2D&gt;.current.get()' and is visible to derived classes.</Issue>
+              </Message>
+             </Messages>
+            </Accessor>
+           </Accessors>
+          </Member>
+         </Members>
+        </Type>
+        <Type Name="Transform2DState" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Messages>
+          <Message TypeName="ComVisibleTypeBaseTypesShouldBeComVisible" Category="Microsoft.Interoperability" CheckId="CA1405" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="DependsOnFix">
+           <Issue Certainty="90" Level="Error">'Transform2DState' is marked ComVisible(true) but has the following ComVisible(false) types in its object hierarchy: 'ATransformState&lt;float, pair2f, angle, pair2f&gt;'</Issue>
+          </Message>
+         </Messages>
+        </Type>
+        <Type Name="Transformation2D" Kind="Class" Accessibility="Public" ExternallyVisible="True">
+         <Messages>
+          <Message TypeName="ComVisibleTypeBaseTypesShouldBeComVisible" Category="Microsoft.Interoperability" CheckId="CA1405" Status="Active" Created="2019-09-06 02:21:07Z" FixCategory="DependsOnFix">
+           <Issue Certainty="90" Level="Error">'Transformation2D' is marked ComVisible(true) but has the following ComVisible(false) types in its object hierarchy: 'ATransformation&lt;float, pair2f, angle, pair2f&gt;'</Issue>
+          </Message>
+         </Messages>
+        </Type>
+       </Types>
+      </Namespace>
+     </Namespaces>
+    </Module>
+   </Modules>
+  </Target>
+ </Targets>
+ <Rules>
+  <Rule TypeName="ComVisibleTypeBaseTypesShouldBeComVisible" Category="Microsoft.Interoperability" CheckId="CA1405">
+   <Name>COM visible type base types should be COM visible</Name>
+   <Description>COM visible types should have an object hierarchy that is uniformly COM visible.</Description>
+   <Resolution Name="Default">{0} is marked ComVisible(true) but has the following ComVisible(false) types in its object hierarchy: {1}</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182202.aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="90">Error</MessageLevel>
+   <File Name="interoperabilityrules.dll" Version="16.0.0.0" />
+  </Rule>
+  <Rule TypeName="DeclareEventHandlersCorrectly" Category="Microsoft.Design" CheckId="CA1009">
+   <Name>Declare event handlers correctly</Name>
+   <Description>By convention, .NET events have two parameters that specify the event sender and event data. Event handler signatures should follow this form: void MyEventHandler(object sender, EventArgs e). The 'sender' parameter is always of type System.Object, even if it is possible to employ a more specific type. The 'e' parameter is always of type System.EventArgs. Events that do not provide event data should use the System.EventHandler delegate type. Event handlers return void so that they can send each event to multiple target methods. Any value returned by a target would be lost after the first call.</Description>
+   <Resolution Name="First">Declare the first parameter of {0} as an object named 'sender'.</Resolution>
+   <Resolution Name="Second">Declare the second parameter of {0} as an EventArgs, or an instance of a type that extends EventArgs, named 'e'.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182133.aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Error</MessageLevel>
+   <File Name="designrules.dll" Version="16.0.0.0" />
+  </Rule>
+  <Rule TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214">
+   <Name>Do not call overridable methods in constructors</Name>
+   <Description>Virtual methods defined on the class should not be called from constructors. If a derived class has overridden the method, the derived class version will be called (before the derived class constructor is called).</Description>
+   <Resolution Name="Default">{0} contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: {1}</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182331.aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">CriticalWarning</MessageLevel>
+   <File Name="usagerules.dll" Version="16.0.0.0" />
+  </Rule>
+  <Rule TypeName="DoNotRaiseExceptionsInUnexpectedLocations" Category="Microsoft.Design" CheckId="CA1065">
+   <Name>Do not raise exceptions in unexpected locations</Name>
+   <Description>Do not explicitly raise exceptions from unexpected locations. There are some methods, such as Equals and GetHashCode, which users do not expect to raise exceptions. Therefore calls to these methods are not commonly wrapped in try catch blocks.</Description>
+   <Resolution Name="PropertyGetter">{0} creates an exception of type {1}, an exception type that should not be raised in a property. If this exception instance might be raised, use a different exception type, convert this property into a method, or change this property's logic so that it no longer raises an exception.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/bb386039.aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="90">Error, Warning</MessageLevel>
+   <File Name="designrules.dll" Version="16.0.0.0" />
+  </Rule>
+  <Rule TypeName="InitializeValueTypeStaticFieldsInline" Category="Microsoft.Usage" CheckId="CA2207">
+   <Name>Initialize value type static fields inline</Name>
+   <Description>Do not declare explicit static constructors on value types. Initializing static data in explicit static constructors results in a value type that is not marked in metadata as 'beforefieldinit'. In this case, the static constructor is not always guaranteed to be called before instance members on the value type are called.</Description>
+   <Resolution Name="Default">Initialize all static fields in {0} when those fields are declared and remove the explicit static constructor.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182346.aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">CriticalError</MessageLevel>
+   <File Name="usagerules.dll" Version="16.0.0.0" />
+  </Rule>
+  <Rule TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033">
+   <Name>Interface methods should be callable by child types</Name>
+   <Description>Explicit method implementations are defined with private accessibility. Classes that derive from classes with explicit method implementations and choose to re-declare them on the class will not be able to call into the base class implementation unless the base class has provided an alternate method with appropriate accessibility. When overriding a base class method that has been hidden by explicit interface implementation, in order to call into the base class implementation, a derived class must cast the base pointer to the relevant interface. When calling through this reference, however, the derived class implementation will actually be invoked, resulting in recursion and an eventual stack overflow.</Description>
+   <Resolution Name="Default">Make {0} sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of {1} and is visible to derived classes.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182153.aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Error</MessageLevel>
+   <File Name="designrules.dll" Version="16.0.0.0" />
+  </Rule>
+  <Rule TypeName="MarkAssembliesWithAssemblyVersion" Category="Microsoft.Design" CheckId="CA1016">
+   <Name>Mark assemblies with AssemblyVersionAttribute</Name>
+   <Description>Assemblies should use version numbers. The version number is considered part of an assembly's identity. Versioning is applied by means of the AssemblyVersion attribute.</Description>
+   <Resolution Name="Default">Add an AssemblyVersion attribute to {0}.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182155.aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Error</MessageLevel>
+   <File Name="designrules.dll" Version="16.0.0.0" />
+  </Rule>
+  <Rule TypeName="OverloadOperatorEqualsOnOverridingValueTypeEquals" Category="Microsoft.Usage" CheckId="CA2231">
+   <Name>Overload operator equals on overriding ValueType.Equals</Name>
+   <Description>Value types that redefine System.ValueType.Equals should redefine the equality operator as well to ensure that these members return the same results. This helps ensure that types that rely on Equals (such as ArrayList and Hashtable) behave in a manner that is expected and consistent with the equality operator.</Description>
+   <Resolution Name="Default">Because {0} is a value type that overrides ValueType.Equals, it should also overload the equality and inequality operators (== and !=).</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182359.aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="75">Warning</MessageLevel>
+   <File Name="usagerules.dll" Version="16.0.0.0" />
+  </Rule>
+ </Rules>
+ <Localized>
+  <String Key="Category">Category</String>
+  <String Key="Certainty">Certainty</String>
+  <String Key="CollapseAll">Collapse All</String>
+  <String Key="CheckId">Check Id</String>
+  <String Key="Error">Error</String>
+  <String Key="Errors">error(s)</String>
+  <String Key="ExpandAll">Expand All</String>
+  <String Key="Help">Help</String>
+  <String Key="Line">Line</String>
+  <String Key="Messages">message(s)</String>
+  <String Key="LocationNotStoredInPdb">[Location not stored in Pdb]</String>
+  <String Key="Project">Project</String>
+  <String Key="Resolution">Resolution</String>
+  <String Key="Rule">Rule</String>
+  <String Key="RuleFile">Rule File</String>
+  <String Key="RuleDescription">Rule Description</String>
+  <String Key="Source">Source</String>
+  <String Key="Status">Status</String>
+  <String Key="Target">Target</String>
+  <String Key="Warning">Warning</String>
+  <String Key="Warnings">warning(s)</String>
+  <String Key="ReportTitle">Code Analysis Report</String>
+ </Localized>
+</FxCopReport>
