@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AWE.Math.FloatExtensions;
+using System;
 
 namespace AWE.Moving {
 
@@ -59,7 +60,7 @@ namespace AWE.Moving {
 
                 if (this.isCurrentOutdated) {
 
-                    this._current = this.pathAnchors.path.GetState (this._position);
+                    this._current = this.pathAnchors.path[this._position];
                     this.isCurrentOutdated = false;
 
                 }
@@ -75,7 +76,7 @@ namespace AWE.Moving {
             this._position = position;
             this._pathAnchors = pathAnchors;
             this._current = current;
-            this.isCurrentOutdated = false;
+            this.isCurrentOutdated = (current != null);
 
         }
 
@@ -89,7 +90,7 @@ namespace AWE.Moving {
 
             if (evaluateCurrent) {
 
-                this._current = pathAnchors.path.GetState (position);
+                this._current = pathAnchors.path[position];
                 this.isCurrentOutdated = false;
 
             }
