@@ -8,14 +8,17 @@ namespace AWE.Moving {
 
     public class TransformPathAnchors<TTransformState> : ICloneable, IReadOnlyList<WeightedTransformState<TTransformState>> where TTransformState : ITransformState {
 
+        #region Static Methods
+
         protected static List<WeightedTransformState<TTransformState>> CombineAnchorCollections (
+            TransformPath<TTransformState> path,
             ReadOnlyCollection<WeightedTransformState<TTransformState>> existingAnchors,
             ReadOnlyCollection<float> anchorPositions,
             bool allowDuplicates = false
         ) {
 
             var combined = (
-                this.count > 0
+                (existingAnchors?.Count ?? 0) > 0
                 ? new LinkedList<WeightedTransformState<TTransformState>> (existingAnchors)
                 : new LinkedList<WeightedTransformState<TTransformState>> ()
             );
@@ -34,7 +37,7 @@ namespace AWE.Moving {
 
                         combined.AddAsPrevious (
                             new WeightedTransformState<TTransformState> (
-                                this.path[anchorPositions[index]],
+                                path[anchorPositions[index]],
                                 anchorPositions[index]
                             ),
                             current
@@ -54,7 +57,7 @@ namespace AWE.Moving {
 
                 combined.AddToEnd (
                     new WeightedTransformState<TTransformState> (
-                        this.path[anchorPositions[index]],
+                        path[anchorPositions[index]],
                         anchorPositions[index]
                     )
                 );
@@ -67,13 +70,15 @@ namespace AWE.Moving {
 
         }
 
+        #endregion
+
         protected List<WeightedTransformState<TTransformState>> anchors;
         protected DValuesInRange<float> anchorFunction;
 
         int IReadOnlyCollection<WeightedTransformState<TTransformState>>.Count => this.count;
 
         public WeightedTransformState<TTransformState> this [int index] => this.anchors?[index];
-        public int count => ((this.anchors == null) ? 0 : this.anchors.Count);
+        public int count => (this.anchors?.Count ?? 0);
 
         public TransformPath<TTransformState> path { get; }
 
@@ -305,6 +310,7 @@ namespace AWE.Moving {
             } else {
 
                 anchorsInRange = CombineAnchorCollections (
+                    this.path,
                     this.FindAnchorsWithinRangeUsingList (lower, upper, includeEndpoints, start).AsReadOnly (),
                     this.anchorFunction (lower, upper)
                 );
@@ -322,7 +328,7 @@ namespace AWE.Moving {
             bool allowDuplicates = false
         ) => new TransformPathAnchors<TTransformState> (
             this.path,
-            CombineAnchorCollections (this.anchors.AsReadOnly (), anchorPositions, allowDuplicates),
+            CombineAnchorCollections (this.path, this.anchors.AsReadOnly (), anchorPositions, allowDuplicates),
             this.anchorFunction
         );
 
