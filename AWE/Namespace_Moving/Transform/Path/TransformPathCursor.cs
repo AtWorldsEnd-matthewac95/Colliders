@@ -7,10 +7,9 @@ namespace AWE.Moving {
         private bool isCurrentOutdated;
         private float _position;
         private float _speed;
+        private TransformPathAnchors<TTransformState> _pathAnchors;
 
         protected TTransformState _current;
-
-        public TransformPath<TTransformState> path { get; protected set; }
 
         public float next => (this._position + this.speed);
 
@@ -21,10 +20,10 @@ namespace AWE.Moving {
             set {
 
                 this._speed = value;
+
                 this.OnSpeedChange ();
 
             }
-
         }
 
         public float position {
@@ -41,13 +40,26 @@ namespace AWE.Moving {
             }
         }
 
+        public TransformPathAnchors<TTransformState> pathAnchors {
+
+            get => this._pathAnchors;
+
+            protected set {
+
+                this._pathAnchors = value;
+
+                this.OnAnchorsChange ();
+
+            }
+        }
+
         public virtual TTransformState current {
 
             get {
 
                 if (this.isCurrentOutdated) {
 
-                    this._current = this.path.GetState (this._position);
+                    this._current = this.pathAnchors.path.GetState (this._position);
                     this.isCurrentOutdated = false;
 
                 }
@@ -57,27 +69,27 @@ namespace AWE.Moving {
             }
         }
 
-        private TransformPathCursor (TransformPath<TTransformState> path, float speed, float position, TTransformState current) {
+        private TransformPathCursor (TransformPathAnchors<TTransformState> pathAnchors, float speed, float position, TTransformState current) {
 
-            this.path = path;
-            this.speed = speed;
+            this._speed = speed;
             this._position = position;
+            this._pathAnchors = pathAnchors;
             this._current = current;
             this.isCurrentOutdated = false;
 
         }
 
-        public TransformPathCursor (TransformPath<TTransformState> path, float speed, float position = 0f, bool evaluateCurrent = false) {
+        public TransformPathCursor (TransformPathAnchors<TTransformState> pathAnchors, float speed, float position = 0f, bool evaluateCurrent = false) {
 
             this.isCurrentOutdated = true;
 
-            this.path = path;
-            this.speed = speed;
+            this._speed = speed;
             this._position = position;
+            this._pathAnchors = pathAnchors;
 
             if (evaluateCurrent) {
 
-                this._current = path.GetState (position);
+                this._current = pathAnchors.path.GetState (position);
                 this.isCurrentOutdated = false;
 
             }
@@ -85,10 +97,39 @@ namespace AWE.Moving {
 
         protected virtual void OnSpeedChange () {}
         protected virtual void OnPositionChange () {}
+        protected virtual void OnAnchorsChange () {}
 
         public void MoveForward () => this.position += this.speed;
 
         public void MoveBackward () => this.position -= this.speed;
+
+        public TransformPathAnchors<TTransformState> UpdateAnchors (
+            TransformPathAnchors<TTransformState> newAnchors,
+            bool resetPosition = false
+        ) {
+
+            var oldAnchors = this.pathAnchors;
+
+            if ((oldAnchors == null) || (newAnchors.path == oldAnchors.path)) {
+
+                this.pathAnchors = newAnchors;
+
+                // Notice the !. If the current position is NOT negligible...
+                if (resetPosition && !this.position.IsNegligible ()) {
+
+                    this.position = 0f;
+
+                }
+
+            } else {
+
+                // TODO - Throw an exception
+
+            }
+
+            return oldAnchors;
+
+        }
 
         object ICloneable.Clone () => this.Clone ();
         public TransformPathCursor<TTransformState> Clone (bool evaluateCurrent = false) {
@@ -97,11 +138,11 @@ namespace AWE.Moving {
 
             if (this.isCurrentOutdated) {
 
-                clone = new TransformPathCursor<TTransformState> (this.path, this.speed, this._position, evaluateCurrent);
+                clone = new TransformPathCursor<TTransformState> (this.pathAnchors, this.speed, this._position, evaluateCurrent);
 
             } else {
 
-                clone = new TransformPathCursor<TTransformState> (this.path, this.speed, this._position, this._current);
+                clone = new TransformPathCursor<TTransformState> (this.pathAnchors, this.speed, this._position, this._current);
 
             }
 

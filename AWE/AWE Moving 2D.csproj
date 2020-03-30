@@ -124,7 +124,6 @@
     <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\IColliderAgent.cs" />
     <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\STransformPathExtensions.cs" />
     <Compile Include="DValuesInRange.cs" />
-    <Compile Include="Namespace_Moving\Transform\Path\TransformPath.cs" />
     <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\IColliderState.cs" />
     <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\ACollider.cs" />
     <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\ACollisionHandler.cs" />
@@ -161,7 +160,7 @@
     <Content Include="Namespace_Moving\Transform\notes.txt" />
     <Compile Include="Namespace_Moving\Transform\Path\TransformPathAnchors.cs" />
     <Compile Include="Namespace_Moving\Transform\WeightedTransformState.cs" />
-    <Compile Include="Namespace_Moving\Transform\Path\_TransformPath.cs" />
+    <Compile Include="Namespace_Moving\Transform\Path\TransformPath.cs" />
     <Compile Include="Namespace_Moving\Transform\ReadOnlyTransform.cs" />
     <Compile Include="Namespace_Moving\Transform\Path\TransformPathCursor.cs" />
     <Compile Include="Namespace_Unity\Namespace_Moving2d\UnityTransform2D.cs" />

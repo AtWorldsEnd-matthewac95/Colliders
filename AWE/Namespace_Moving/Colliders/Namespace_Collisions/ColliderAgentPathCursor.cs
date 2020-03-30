@@ -9,7 +9,7 @@ namespace AWE.Moving.Collisions {
         protected List<WeightedTransformState<TTransformState>> cachedInterpolations;
 
         public ColliderAgentPathCursor (TransformPathCursor<TTransformState> cursor, bool evaluateCurrent) : this (
-            cursor.path,
+            cursor.pathAnchors,
             cursor.speed,
             cursor.position,
             evaluateCurrent
@@ -17,11 +17,11 @@ namespace AWE.Moving.Collisions {
         }
 
         public ColliderAgentPathCursor (
-            TransformPath<TTransformState> path,
+            TransformPathAnchors<TTransformState> pathAnchors,
             float speed,
             float position = 0f,
             bool evaluateCurrent = false
-        ) : base (path, speed, position, evaluateCurrent) {
+        ) : base (pathAnchors, speed, position, evaluateCurrent) {
 
             this.cachedInterpolations = null;
 
@@ -41,6 +41,13 @@ namespace AWE.Moving.Collisions {
 
         }
 
+        protected override void OnAnchorsChange () {
+
+            this.OnChange ();
+            base.OnAnchorsChange ();
+
+        }
+
         private void OnChange () => this.cachedInterpolations = null;
 
         public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection () => this.CreateInterpolationCollection (this.speed);
@@ -51,7 +58,7 @@ namespace AWE.Moving.Collisions {
 
             if (interpolations == null) {
 
-                var anchors = this.path.FindAnchorsInRange (this.position, (this.position + cursorSpeed), includeEndpoints: true);
+                var anchors = this.pathAnchors.FindAnchorsWithinRange (this.position, (this.position + cursorSpeed), includeEndpoints: true);
                 interpolations = new List<WeightedTransformState<TTransformState>> (anchors.Count);
 
                 if (anchors.Count > 0) {

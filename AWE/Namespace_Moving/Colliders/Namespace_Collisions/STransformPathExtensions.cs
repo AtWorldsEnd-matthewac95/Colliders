@@ -8,7 +8,7 @@
             float position = 0f,
             bool evaluateCurrent = false
         ) where TTransformState : ITransformState => new ColliderAgentPathCursor<TTransformState> (
-            path,
+            path.defaultAnchors,
             speed,
             position,
             evaluateCurrent

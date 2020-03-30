@@ -8,6 +8,65 @@ namespace AWE.Moving {
 
     public class TransformPathAnchors<TTransformState> : ICloneable, IReadOnlyList<WeightedTransformState<TTransformState>> where TTransformState : ITransformState {
 
+        protected static List<WeightedTransformState<TTransformState>> CombineAnchorCollections (
+            ReadOnlyCollection<WeightedTransformState<TTransformState>> existingAnchors,
+            ReadOnlyCollection<float> anchorPositions,
+            bool allowDuplicates = false
+        ) {
+
+            var combined = (
+                this.count > 0
+                ? new LinkedList<WeightedTransformState<TTransformState>> (existingAnchors)
+                : new LinkedList<WeightedTransformState<TTransformState>> ()
+            );
+            var length = anchorPositions.Count;
+            var current = combined.CopyFrontPosition ();
+
+            // TODO - I am certain there is a more efficient way of setting up these loops...
+            int index = 0;
+
+            while (current.hasValue && (index < length)) {
+
+                while ((anchorPositions[index] < current.value.weight) && (index < length)) {
+
+                    // Notice the !. If the difference is NOT negligible...
+                    if (allowDuplicates || !(anchorPositions[index] - current.value.weight).IsNegligible ()) {
+
+                        combined.AddAsPrevious (
+                            new WeightedTransformState<TTransformState> (
+                                this.path[anchorPositions[index]],
+                                anchorPositions[index]
+                            ),
+                            current
+                        );
+
+                    }
+
+                    index++;
+
+                }
+
+                current.MoveNext ();
+
+            }
+
+            while (index < length) {
+
+                combined.AddToEnd (
+                    new WeightedTransformState<TTransformState> (
+                        this.path[anchorPositions[index]],
+                        anchorPositions[index]
+                    )
+                );
+
+                index++;
+
+            }
+
+            return combined.AsList ();
+
+        }
+
         protected List<WeightedTransformState<TTransformState>> anchors;
         protected DValuesInRange<float> anchorFunction;
 
@@ -16,10 +75,10 @@ namespace AWE.Moving {
         public WeightedTransformState<TTransformState> this [int index] => this.anchors?[index];
         public int count => ((this.anchors == null) ? 0 : this.anchors.Count);
 
-        public _TransformPath<TTransformState> path { get; protected set; }
+        public TransformPath<TTransformState> path { get; }
 
         private TransformPathAnchors (
-            _TransformPath<TTransformState> path,
+            TransformPath<TTransformState> path,
             ReadOnlyCollection<WeightedTransformState<TTransformState>> anchors,
             DValuesInRange<float> anchorFunction
         ) {
@@ -37,7 +96,7 @@ namespace AWE.Moving {
         }
 
         private TransformPathAnchors (
-            _TransformPath<TTransformState> path,
+            TransformPath<TTransformState> path,
             List<WeightedTransformState<TTransformState>> anchors,
             DValuesInRange<float> anchorFunction
         ) {
@@ -48,8 +107,16 @@ namespace AWE.Moving {
 
         }
 
+        public TransformPathAnchors (TransformPath<TTransformState> path) {
+
+            this.path = path;
+            this.anchors = null;
+            this.anchorFunction = null;
+
+        }
+
         public TransformPathAnchors (
-            _TransformPath<TTransformState> path,
+            TransformPath<TTransformState> path,
             ReadOnlyCollection<float> positions,
             bool sort = false,
             bool checkRange = false
@@ -91,7 +158,7 @@ namespace AWE.Moving {
             }
         }
 
-        public TransformPathAnchors (_TransformPath<TTransformState> path, DValuesInRange<float> anchorFunction) {
+        public TransformPathAnchors (TransformPath<TTransformState> path, DValuesInRange<float> anchorFunction) {
 
             this.path = path;
             this.anchors = new List<WeightedTransformState<TTransformState>> ();
@@ -99,7 +166,7 @@ namespace AWE.Moving {
 
         }
 
-        protected List<WeightedTransformState<TTransformState>> FindAnchorsInRangeUsingList (
+        protected List<WeightedTransformState<TTransformState>> FindAnchorsWithinRangeUsingList (
             float lower,
             float upper,
             bool includeEndpoints = true,
@@ -119,6 +186,13 @@ namespace AWE.Moving {
                     if (anchor.weight > upper) {
 
                         if (includeEndpoints) {
+
+                            // If we haven't reached lower yet, add both endpoints now.
+                            if (!reachedLower) {
+
+                                anchorsInRange.Add (new WeightedTransformState<TTransformState> (this.path[lower], lower));
+
+                            }
 
                             anchorsInRange.Add (new WeightedTransformState<TTransformState> (this.path[upper], upper));
 
@@ -155,6 +229,14 @@ namespace AWE.Moving {
                     break;
 
                 }
+            }
+
+            // If we got through the for loop without reaching the lower bound or adding anchors, add the endpoints now.
+            if (includeEndpoints && !reachedLower && (anchorsInRange.Count <= 0)) {
+
+                anchorsInRange.Add (new WeightedTransformState<TTransformState> (this.path[lower], lower));
+                anchorsInRange.Add (new WeightedTransformState<TTransformState> (this.path[upper], upper));
+
             }
 
             return anchorsInRange;
@@ -203,9 +285,6 @@ namespace AWE.Moving {
 
         }
 
-        IEnumerator IEnumerable.GetEnumerator () => this.GetEnumerator ();
-        public virtual IEnumerator<WeightedTransformState<TTransformState>> GetEnumerator () => this.anchors?.GetEnumerator ();
-
         public virtual List<WeightedTransformState<TTransformState>> FindAnchorsWithinRange (
             float lower,
             float upper,
@@ -215,17 +294,20 @@ namespace AWE.Moving {
 
             List<WeightedTransformState<TTransformState>> anchorsInRange;
 
-            if (this.count > 0) {
+            if (this.anchorFunction == null) {
 
-                anchorsInRange = this.FindAnchorsInRangeUsingList (lower, upper, includeEndpoints, start);
+                anchorsInRange = this.FindAnchorsWithinRangeUsingList (lower, upper, includeEndpoints, start);
 
-            } else if (this.anchorFunction != null) {
+            } else if (this.count <= 0) {
 
                 anchorsInRange = this.FindAnchorsWithinRangeUsingFunction (lower, upper, includeEndpoints);
 
             } else {
 
-                anchorsInRange = new List<WeightedTransformState<TTransformState>> ();
+                anchorsInRange = CombineAnchorCollections (
+                    this.FindAnchorsWithinRangeUsingList (lower, upper, includeEndpoints, start).AsReadOnly (),
+                    this.anchorFunction (lower, upper)
+                );
 
             }
 
@@ -233,64 +315,19 @@ namespace AWE.Moving {
 
         }
 
-        private void Test<TOne, TTwo> (TOne one, TTwo two) where TOne : IComparable<TTwo> { }
-
         public TransformPathAnchors<TTransformState> Add (params float[] anchorPositions) => this.Add (Array.AsReadOnly (anchorPositions), false);
         public TransformPathAnchors<TTransformState> Add (bool allowDuplicates, params float[] anchorPositions) => this.Add (Array.AsReadOnly (anchorPositions), allowDuplicates);
-        public virtual TransformPathAnchors<TTransformState> Add (ReadOnlyCollection<float> anchorPositions, bool allowDuplicates) {
+        public virtual TransformPathAnchors<TTransformState> Add (
+            ReadOnlyCollection<float> anchorPositions,
+            bool allowDuplicates = false
+        ) => new TransformPathAnchors<TTransformState> (
+            this.path,
+            CombineAnchorCollections (this.anchors.AsReadOnly (), anchorPositions, allowDuplicates),
+            this.anchorFunction
+        );
 
-            var newAnchors = (
-                this.count > 0
-                ? new LinkedList<WeightedTransformState<TTransformState>> (this.anchors.AsReadOnly ())
-                : new LinkedList<WeightedTransformState<TTransformState>> ()
-            );
-            var length = anchorPositions.Count;
-            var current = newAnchors.CopyFrontPosition ();
-
-            // TODO - I am certain there is a more efficient way of setting up these loops...
-            int index = 0;
-
-            while (current.hasValue && (index < length)) {
-
-                while ((anchorPositions[index] < current.value.weight) && (index < length)) {
-
-                    // Notice the !. If the difference is NOT negligible...
-                    if (allowDuplicates || !(anchorPositions[index] - current.value.weight).IsNegligible ()) {
-
-                        newAnchors.AddAsPrevious (
-                            new WeightedTransformState<TTransformState> (
-                                this.path[anchorPositions[index]],
-                                anchorPositions[index]
-                            ),
-                            current
-                        );
-
-                    }
-
-                    index++;
-
-                }
-
-                current.MoveNext ();
-
-            }
-
-            while (index < length) {
-
-                newAnchors.AddToEnd (
-                    new WeightedTransformState<TTransformState> (
-                        this.path[anchorPositions[index]],
-                        anchorPositions[index]
-                    )
-                );
-
-                index++;
-
-            }
-
-            return new TransformPathAnchors<TTransformState> (this.path, newAnchors.AsList (), this.anchorFunction);
-
-        }
+        IEnumerator IEnumerable.GetEnumerator () => this.GetEnumerator ();
+        public virtual IEnumerator<WeightedTransformState<TTransformState>> GetEnumerator () => this.anchors?.GetEnumerator ();
 
         object ICloneable.Clone () => this.Clone ();
         public TransformPathAnchors<TTransformState> Clone () => new TransformPathAnchors<TTransformState> (this.path, this.anchors.AsReadOnly (), this.anchorFunction);
