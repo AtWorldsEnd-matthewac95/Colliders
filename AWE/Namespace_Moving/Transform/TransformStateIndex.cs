@@ -12,10 +12,10 @@ namespace AWE.Moving {
 
         public static bool operator >= (TransformStateIndex i, TransformStateIndex j) => ((i.transform == j.transform) ? (i.CompareTo (j) >= 0) : false);
 
-        private readonly ITransform transform;
+        private readonly IReadOnlyTransform transform;
         private readonly DateTime time;
 
-        public TransformStateIndex (ITransform transform) : this () {
+        public TransformStateIndex (IReadOnlyTransform transform) : this () {
 
             this.transform = transform;
             this.time = DateTime.Now;
@@ -45,7 +45,7 @@ namespace AWE.Moving {
 
         public int CompareTo (TransformStateIndex other) => this.time.CompareTo (other.time);
 
-        public bool IsSameTransform (ITransform transform) => (this.transform == transform);
+        public bool IsSameTransform (IReadOnlyTransform transform) => (this.transform.Equals (transform));
 
     }
 }

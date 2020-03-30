@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AweException.cs" />
+    <Compile Include="AweTypeArgumentException.cs" />
     <Compile Include="AweOrphanedNodeException.cs" />
     <Compile Include="ComparableKeyValuePair.cs" />
     <Compile Include="BitLayerMap.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="DFrameEvent.cs" />
     <Compile Include="DirectionGradient.cs" />
     <Compile Include="EDirection.cs" />
+    <Compile Include="FloatRange.cs" />
     <Compile Include="IFrameEmitter.cs" />
     <Compile Include="IGradient.cs" />
     <Compile Include="IntPair.cs" />
@@ -116,34 +118,52 @@
     <Compile Include="Namespace_Math\Shapes\SShapeMath\SShapeMath_orientation.cs" />
     <Compile Include="Namespace_Math\Shapes\SShapeMath\SShapeMath_pointInShape.cs" />
     <Compile Include="Namespace_Math\Vector2D.cs" />
-    <Compile Include="Namespace_Moving\Colliders\AColliderFrame.cs" />
-    <Compile Include="Namespace_Moving\Colliders\CollisionHandler.cs" />
-    <Compile Include="Namespace_Moving\Colliders\ICollider.cs" />
-    <Compile Include="Namespace_Moving\Colliders\ICollisionResponsive.cs" />
+    <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\ColliderAgentPathCursor.cs" />
+    <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\Collision.cs" />
+    <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\ICollider.cs" />
+    <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\IColliderAgent.cs" />
+    <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\STransformPathExtensions.cs" />
+    <Compile Include="DValuesInRange.cs" />
+    <Compile Include="Namespace_Moving\Transform\Path\TransformPath.cs" />
+    <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\IColliderState.cs" />
+    <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\ACollider.cs" />
+    <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\ACollisionHandler.cs" />
+    <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\ICollisionHandler.cs" />
+    <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\GenericCollider.cs" />
+    <Compile Include="Namespace_Moving\Colliders\Namespace_Collisions\TempCollider.cs" />
     <Compile Include="Namespace_Moving\MovingBody\EMovementState.cs" />
     <Compile Include="Namespace_Moving\MovingBody\IEnumerableMovement.cs" />
     <Compile Include="Namespace_Moving\MovingBody\IFrameMovement.cs" />
     <Compile Include="Namespace_Moving\MovingBody\IMovement.cs" />
     <Compile Include="Namespace_Moving\MovingBody\ITimeMovement.cs" />
     <Compile Include="Namespace_Moving\MovingBody\MovingBody.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\Colliders\ConvexPolygonCollider2D.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\Colliders\ConvexPolygonCollider2DState.cs" />
     <Compile Include="Namespace_Moving\Namespace_Moving2d\AMovingPolygon2D.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\MovingConvexPolygon2D.cs" />
     <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\ATransform2D.cs" />
     <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\ATransform2DListener.cs" />
-    <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\ITransform2DState.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\IReadOnlyTransform2D.cs" />
+    <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\ReadOnlyTransform2D.cs" />
+    <Compile Include="Namespace_Moving\Transform\Path\DTransformPath.cs" />
+    <Compile Include="Namespace_Moving\Transform\IReadOnlyTransform.cs" />
     <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\VTransform2DListener.cs" />
     <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\Transformation2D.cs" />
-    <Compile Include="Namespace_Moving\Namespace_Moving2d\TranslatingBounds2D.cs" />
-    <Compile Include="Namespace_Moving\Namespace_Moving2d\MovingShapeBounds2D.cs" />
     <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\DTransform2DUpdate.cs" />
     <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\ITransform2D.cs" />
     <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\ITransform2DListener.cs" />
-    <Compile Include="Namespace_Moving\Namespace_Moving2d\Point2DGradient.cs" />
     <Compile Include="Namespace_Moving\Namespace_Moving2d\Transform\Transform2DState.cs" />
     <Compile Include="Namespace_Moving\Transform\ATransform.cs" />
     <Compile Include="Namespace_Moving\Transform\ATransformation.cs" />
     <Compile Include="Namespace_Moving\Transform\ATransformState.cs" />
-    <Compile Include="Namespace_Moving\Transform\GenericTransformation.cs" />
     <Compile Include="Namespace_Moving\Transform\ITransformation.cs" />
+    <Content Include="Do ReadOnlyCollections have object permanence.txt" />
+    <Content Include="Namespace_Moving\Transform\notes.txt" />
+    <Compile Include="Namespace_Moving\Transform\Path\TransformPathAnchors.cs" />
+    <Compile Include="Namespace_Moving\Transform\WeightedTransformState.cs" />
+    <Compile Include="Namespace_Moving\Transform\Path\_TransformPath.cs" />
+    <Compile Include="Namespace_Moving\Transform\ReadOnlyTransform.cs" />
+    <Compile Include="Namespace_Moving\Transform\Path\TransformPathCursor.cs" />
     <Compile Include="Namespace_Unity\Namespace_Moving2d\UnityTransform2D.cs" />
     <Compile Include="Namespace_Moving\Transform\ITransform.cs" />
     <Compile Include="Namespace_Moving\Transform\ITransformListener.cs" />
@@ -151,6 +171,9 @@
     <Compile Include="Namespace_Moving\Transform\TransformStateIndex.cs" />
     <Compile Include="OperationContext.cs" />
     <Compile Include="Pair.cs" />
+    <Compile Include="Ranges\ACloneableRange.cs" />
+    <Compile Include="Ranges\ARange.cs" />
+    <Compile Include="Ranges\AStructRange.cs" />
     <Compile Include="SEDirectionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

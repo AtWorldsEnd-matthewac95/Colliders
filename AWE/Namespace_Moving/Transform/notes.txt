@@ -1,0 +1,10 @@
+﻿Remove transform interfaces with generics. Keep all abstract transform classes with generics.
+
+
+Reasoning is as follows...
+
+ 1. ATransform<> exists as a minimal implementation of ITransform<>, solely to prevent code duplication and make dealing with explicit interface declarations less annoying.
+ 2. The only reason anything would ever need to implement ITransform<> directly without inheriting ATransform<> is if the implementing class was a full implementation - including the implementation of explicit interface declarations.
+ 3. However, in that scenario, there would be no cost to simply inherit from ATransform<>, since ATransform<> is a MINIMAL implementation of ITransform<>, and therefore has no binding implementations of its own.
+ 4. Therefore, it is not necessary to have BOTH ITransform<> and ATransform<>.
+ 5. ATransform<> exists out of convenience to not repeat code implementations, so it has other uses. ITransform<> only exists to define structure, which ATransform<> technically can also do.

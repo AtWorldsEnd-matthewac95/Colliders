@@ -161,26 +161,6 @@ namespace AWE.UnitTests.XUnit.Math {
         )]
         [InlineData(
             new float[] {
-                0f, 0f,
-                0f, 4f,
-                4f, 4f,
-                4f, 0f
-            },
-            new float[] {
-                4f, 4f,
-                4f, 0f,
-                0f, 0f,
-                0f, 4f
-            },
-            new float[] {
-                0f, 4f,
-                4f, 4f,
-                4f, 0f,
-                0f, 0f
-            }
-        )]
-        [InlineData(
-            new float[] {
                 0f, 4f,
                 6f, 3f,
                 8f, -4f,

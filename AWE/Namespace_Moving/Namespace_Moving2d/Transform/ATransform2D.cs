@@ -3,22 +3,16 @@ using AWE.Math;
 
 namespace AWE.Moving.Moving2D {
 
-    public abstract class ATransform2D : ATransform<float, pair2f, angle, pair2f>, ITransform2D {
-
-        public abstract Transform2DState state { get; }
-
-        ITransformState ITransform.state => this.state;
-        ITransformState<float> ITransform<float>.state => this.state;
-        ITransformState<float, pair2f, angle, pair2f> ITransform<float, pair2f, angle, pair2f>.state => this.state;
-        IReadOnlyList<float> ITransform<float>.position => this.position;
-        IReadOnlyList<float> ITransform<float>.rotation => this.rotation;
-        IReadOnlyList<float> ITransform<float>.dilation => this.dilation;
+    public abstract class ATransform2D : ATransform<float, pair2f, angle, pair2f, Transformation2D, Transform2DState>, ITransform2D {
 
         public event DTransform2DUpdate OnAnyChange;
         public event DTransform2DTransformation OnTransformation;
         public event DTransform2DTranslation OnTranslation;
         public event DTransform2DRotation OnRotation;
         public event DTransform2DDilation OnDilation;
+
+        IReadOnlyTransform2D ITransform2D.AsReadOnly () => this.AsReadOnly ();
+        new public ReadOnlyTransform2D AsReadOnly () => new ReadOnlyTransform2D (this);
 
         #region AddListener
         public void AddListener (ATransform2DListener listener) {
@@ -41,32 +35,13 @@ namespace AWE.Moving.Moving2D {
 
         }
 
-        public override void AddListener (ITransformListener<float, pair2f, angle, pair2f> listener) {
+        public override void AddListener (ITransformListener<float, pair2f, angle, pair2f, Transformation2D, Transform2DState> listener) {
 
             if (listener.hasOnAnyChange) this.OnAnyChange += listener.OnAnyChange;
             if (listener.hasOnTransformation) this.OnTransformation += listener.OnTransformation;
             if (listener.hasOnTranslation) this.OnTranslation += listener.OnTranslation;
             if (listener.hasOnRotation) this.OnRotation += listener.OnRotation;
             if (listener.hasOnDilation) this.OnDilation += listener.OnDilation;
-
-        }
-
-        public override void AddListener (ITransformListener<float> listener) {
-
-            if (listener.hasOnAnyChange) this.OnAnyChange += listener.OnAnyChange;
-            if (listener.hasOnTransformation) this.OnTransformation += listener.OnTransformation;
-            if (listener.hasOnTranslation) this.OnTranslation += ((resultantState, translation) => listener.OnTranslation (
-                resultantState,
-                translation
-            ));
-            if (listener.hasOnRotation) this.OnRotation += ((resultantState, rotation) => listener.OnRotation (
-                resultantState,
-                rotation
-            ));
-            if (listener.hasOnDilation) this.OnDilation += ((resultantState, dilation) => listener.OnDilation (
-                resultantState,
-                dilation
-            ));
 
         }
 
@@ -90,41 +65,111 @@ namespace AWE.Moving.Moving2D {
         }
         # endregion
 
-        public abstract BooleanNote TransformBy (Transformation2D transformation);
-        public abstract BooleanNote TransformTo (Transform2DState state);
-        public abstract BooleanNote TransformTo (Transformation2D transformation);
+        public override BooleanNote TransformBy (Transformation2D transformation) {
 
-        BooleanNote ITransform<float, pair2f, angle, pair2f>.TransformBy (ITransformation<float, pair2f, angle, pair2f> transformation)
-            => this.TransformBy (new Transformation2D (transformation.translation, transformation.rotation, transformation.dilation));
-        BooleanNote ITransform<float, pair2f, angle, pair2f>.TransformTo (ITransformState<float, pair2f, angle, pair2f> state)
-            => this.TransformTo (new Transform2DState (this, state.position, state.rotation, state.dilation));
-        BooleanNote ITransform<float, pair2f, angle, pair2f>.TransformTo (ITransformation<float, pair2f, angle, pair2f> transformation)
-            => this.TransformTo (new Transformation2D (transformation.translation, transformation.rotation, transformation.dilation));
+            var note = this.Transform (transformation);
 
-        protected override ITransformation<float, pair2f, angle, pair2f> ConvertToDerivedTransformation (ITransformation<float> genericTransformation) => new Transformation2D (
-            this.ConvertToTranslation (genericTransformation.translation),
-            this.ConvertToRotation (genericTransformation.rotation),
-            this.ConvertToDilation (genericTransformation.dilation)
-        );
+            this.OnTranslation?.Invoke (this.state, transformation.translation);
+            this.OnRotation?.Invoke (this.state, transformation.rotation);
+            this.OnDilation?.Invoke (this.state, transformation.dilation);
+            this.OnTransformation?.Invoke (this.state, transformation);
+            this.OnAnyChange?.Invoke (this.state);
 
-        protected override ITransformState<float, pair2f, angle, pair2f> ConvertToDerivedState (ITransformState<float> genericState) => new Transform2DState (
-            this,
-            this.ConvertToTranslation (genericState.position),
-            this.ConvertToRotation (genericState.rotation),
-            this.ConvertToDilation (genericState.dilation)
-        );
+            return note;
 
-        protected override pair2f ConvertToTranslation (IReadOnlyList<float> values) => new pair2f (
-            ((values.Count > 0) ? values[0] : 0f),
-            ((values.Count > 1) ? values[1] : 0f)
-        );
+        }
 
-        protected override angle ConvertToRotation (IReadOnlyList<float> values) => new angle (((values.Count > 0) ? values[0] : 0f), EAngleMode.Radian);
+        public override BooleanNote TranslateBy (pair2f translation) {
 
-        protected override pair2f ConvertToDilation (IReadOnlyList<float> values) => new pair2f (
-            ((values.Count > 0) ? values[0] : 0f),
-            ((values.Count > 1) ? values[1] : 0f)
-        );
+            var note = this.Translate (translation);
 
+            this.OnTranslation?.Invoke (this.state, translation);
+            this.OnTransformation?.Invoke (this.state, new Transformation2D (translation));
+            this.OnAnyChange?.Invoke (this.state);
+
+            return note;
+
+        }
+
+        public override BooleanNote RotateBy (angle rotation) {
+
+            var note = this.Rotate (rotation);
+
+            this.OnRotation?.Invoke (this.state, rotation);
+            this.OnTransformation?.Invoke (this.state, new Transformation2D (rotation));
+            this.OnAnyChange?.Invoke (this.state);
+
+            return note;
+
+        }
+
+        public override BooleanNote TransformTo (Transform2DState state) {
+
+            var transformation = (state - this.state);
+            var note = this.Transform (transformation);
+
+            this.OnTranslation?.Invoke (this.state, transformation.translation);
+            this.OnRotation?.Invoke (this.state, transformation.rotation);
+            this.OnDilation?.Invoke (this.state, transformation.dilation);
+            this.OnTransformation?.Invoke (this.state, transformation);
+            this.OnAnyChange?.Invoke (this.state);
+
+            return note;
+
+        }
+
+        public override BooleanNote TransformTo (Transformation2D transformation) {
+
+            var diff = (new Transform2DState (this, transformation) - this.state);
+            var note = this.Transform (diff);
+
+            this.OnTranslation?.Invoke (this.state, diff.translation);
+            this.OnRotation?.Invoke (this.state, diff.rotation);
+            this.OnDilation?.Invoke (this.state, diff.dilation);
+            this.OnTransformation?.Invoke (this.state, diff);
+            this.OnAnyChange?.Invoke (this.state);
+
+            return note;
+
+        }
+
+        public override BooleanNote TranslateTo (pair2f position) {
+
+            var diff = (position - this.position);
+            var note = this.Translate (diff);
+
+            this.OnTranslation?.Invoke (this.state, diff);
+            this.OnTransformation?.Invoke (this.state, new Transformation2D (diff));
+            this.OnAnyChange?.Invoke (this.state);
+
+            return note;
+
+        }
+
+        public override BooleanNote RotateTo (angle rotation) {
+
+            var diff = (rotation - this.rotation);
+            var note = this.Rotate (diff);
+
+            this.OnRotation?.Invoke (this.state, diff);
+            this.OnTransformation?.Invoke (this.state, new Transformation2D (diff));
+            this.OnAnyChange?.Invoke (this.state);
+
+            return note;
+
+        }
+
+        public override BooleanNote DilateTo (pair2f dilation) {
+
+            var transformation = (new Transform2DState (this, this.position, this.rotation, dilation) - this.state);
+            var note = this.Transform (transformation);
+
+            this.OnDilation?.Invoke (this.state, transformation.dilation);
+            this.OnTransformation?.Invoke (this.state, transformation);
+            this.OnAnyChange?.Invoke (this.state);
+
+            return note;
+
+        }
     }
 }

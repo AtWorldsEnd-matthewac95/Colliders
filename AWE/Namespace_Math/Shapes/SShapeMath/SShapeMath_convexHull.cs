@@ -7,11 +7,11 @@ namespace AWE.Math {
 
     public static partial class SShapeMath {
 
-        public static List<pair2f> GetConvexHull (ReadOnlyCollection<pair2f> shape) => GetConvexHull (shape, new pair2f (1f, 1f), (point => {}));
+        public static List<pair2f> GetConvexHull (ReadOnlyCollection<pair2f> shape) => GetConvexHull (shape, pair2f.one, (point => {}));
 
         public static List<pair2f> GetConvexHull (ReadOnlyCollection<pair2f> shape, pair2f normal) => GetConvexHull (shape, normal, (point => {}));
 
-        public static List<pair2f> GetConvexHull (ReadOnlyCollection<pair2f> shape, Action<pair2f> forEach) => GetConvexHull (shape, new pair2f (1f, 1f), forEach);
+        public static List<pair2f> GetConvexHull (ReadOnlyCollection<pair2f> shape, Action<pair2f> forEach) => GetConvexHull (shape, pair2f.one, forEach);
 
         public static List<pair2f> GetConvexHull (ReadOnlyCollection<pair2f> shape, pair2f normal, Action<pair2f> forEach) {
 

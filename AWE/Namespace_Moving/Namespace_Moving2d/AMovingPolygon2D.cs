@@ -1,87 +1,104 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using AWE.Math;
 
 namespace AWE.Moving.Moving2D {
 
-    public abstract class AMovingPolygon2D<TPolygon2D> : ATransform2DListener, IGradient<TPolygon2D>, IPolygon2D where TPolygon2D : class, IPolygon2D {
+    public abstract class AMovingPolygon2D<TPolygon2D> where TPolygon2D : APolygon2D {
 
-        protected ATransform2D transform;
-        protected TPolygon2D _current;
+        public static AMovingPolygon2D<TPolygon2D> operator + (AMovingPolygon2D<TPolygon2D> m, Transformation2D t) => m.Add (t);
+        public static AMovingPolygon2D<TPolygon2D> operator - (AMovingPolygon2D<TPolygon2D> m, Transformation2D t) => m.Subtract (t);
 
-        public virtual TPolygon2D current {
+        public TPolygon2D current { get; }
+        public pair2f center { get; }
 
-            get {
+        public AMovingPolygon2D (TPolygon2D current, pair2f center) {
 
-                if (this._current == null) {
+            this.current = current;
+            this.center = center;
 
-                    this._current = this.CreateCurrent ();
+        }
+
+        protected abstract AMovingPolygon2D<TPolygon2D> CreateMovingPolygon (APolygon2D current, pair2f center);
+        protected abstract AMovingPolygon2D<TPolygon2D> CreatePolygonFromPoints (ReadOnlyCollection<pair2f> points, pair2f center);
+
+        public virtual AMovingPolygon2D<TPolygon2D> Add (
+            Transformation2D transformation,
+            pair2f centerOfTransformation = default,
+            pair2f centerAfterTransformation = default
+        ) {
+
+            if (centerOfTransformation.isZero) {
+
+                centerOfTransformation = this.center;
+
+            }
+
+            if (centerAfterTransformation.isZero) {
+
+                centerAfterTransformation = (this.center + transformation.translation);
+
+            }
+
+            AMovingPolygon2D<TPolygon2D> polygon;
+
+            if (transformation.dilation.isOne) {
+
+                polygon = this.CreateMovingPolygon (
+                    current.CreateOffset (transformation.translation, transformation.rotation),
+                    centerOfTransformation
+                );
+
+            } else {
+
+                var points = new List<pair2f> ();
+
+                for (int i = 0; i < this.current.count; i++) {
+
+                    var temp = (this.current[i] - centerOfTransformation);
+                    temp = new pair2f ((temp.x * transformation.dilation.x), (temp.y * transformation.dilation.y));
+                    points.Add ((temp + transformation.rotation) + transformation.translation);
 
                 }
 
-                return this._current;
+                polygon = this.CreatePolygonFromPoints (points.AsReadOnly (), centerAfterTransformation);
 
             }
-        }
 
-        public AMovingPolygon2D (ATransform2D transform) {
-
-            transform.AddListener (this);
-            this.transform = transform;
+            return polygon;
 
         }
 
-# region IReadOnlyList
-        int IReadOnlyCollection<pair2f>.Count => this.current.count;
+        public virtual AMovingPolygon2D<TPolygon2D> Subtract (
+            Transformation2D transformation,
+            pair2f centerOfTransformation = default,
+            pair2f centerAfterTransformation = default
+        ) {
 
-        pair2f IReadOnlyList<pair2f>.this[int index] => this.current[index];
+            if (centerOfTransformation.isZero) {
 
-        IEnumerator IEnumerable.GetEnumerator () => this.current.GetEnumerator ();
-        IEnumerator<pair2f> IEnumerable<pair2f>.GetEnumerator () => this.current.GetEnumerator ();
-# endregion
+                centerOfTransformation = this.center;
 
-# region IShape2D
-        pair2f IShape2D.center => this.current.center;
-        bool IShape2D.isConvex => this.current.isConvex;
+            }
 
-        IShape2D IShape2D.CreateOffset (pair2f offset) => this.CreateOffset (offset);
-        List<pair2f> IShape2D.CreateVertexList () => this.current.CreateVertexList ();
-        List<ICurve2D> IShape2D.CreateCurveList () => this.current.CreateCurveList ();
-        List<ICurve2DSegment> IShape2D.CreateCurveSegmentList () => this.current.CreateCurveSegmentList ();
-        bool IShape2D.IsContainingPoint (pair2f point) => this.current.IsContainingPoint (point);
-# endregion
+            if (centerAfterTransformation.isZero) {
 
-# region IPolygon2D
-        Bounds2D IPolygon2D.bounds => this.current.bounds;
-        ReadOnlyCollection<pair2f> IPolygon2D.unoffsetVerticies => this.current.unoffsetVerticies;
-        int IPolygon2D.count => this.current.count;
+                centerAfterTransformation = (this.center - transformation.translation);
 
-        Polygon2DEdge IPolygon2D.this[int a, int b] => this.current[new IntPair (a, b)];
-        Polygon2DEdge IPolygon2D.this[IntPair indicies] => this.current[indicies];
+            }
 
-        bool IPolygon2D.AddRangeOfPointsToList(
-            List<pair2f> list,
-            int start,
-            int end,
-            DPointConditional SkipCondition,
-            DPointConditional StartCondition,
-            DPointConditional ExitCondition
-        ) => this.current.AddRangeOfPointsToList (list, start, end, SkipCondition, StartCondition, ExitCondition);
-        IPolygon2D IPolygon2D.CreateOffset (pair2f offset) => this.CreateOffset (offset);
-        List<Line2D> IPolygon2D.CreateLineList () => this.current.CreateLineList ();
-        List<Polygon2DEdge> IPolygon2D.CreateEdgeList () => this.current.CreateEdgeList ();
-        List<IntPair> IPolygon2D.CreateEdgeIndexList () => this.current.CreateEdgeIndexList ();
-        ACyclicIndexIterator<Polygon2DEdge> IPolygon2D.CreateEdgeIterator (int startingIndex) => this.current.CreateEdgeIterator (startingIndex);
-        ACyclicIndexIterator<pair2f> IPolygon2D.CreateVertexIterator (int startingIndex) => this.current.CreateVertexIterator (startingIndex);
-        int IPolygon2D.GetNextIndex (int index) => this.current.GetNextIndex (index);
-        int IPolygon2D.GetPreviousIndex (int index) => this.current.GetPreviousIndex (index);
-        bool IPolygon2D.IsIntersecting (IPolygon2D other) => this.current.IsIntersecting (other);
-# endregion
+            var points = new List<pair2f> ();
 
-        protected abstract TPolygon2D CreateCurrent ();
+            for (int i = 0; i < this.current.count; i++) {
 
-        public abstract TPolygon2D CreateOffset (pair2f offset);
+                var temp = (this.current[i] - centerOfTransformation);
+                temp = new pair2f ((temp.x / transformation.dilation.x), (temp.y / transformation.dilation.y));
+                points.Add ((temp - transformation.rotation) - transformation.translation);
 
+            }
+
+            return this.CreatePolygonFromPoints (points.AsReadOnly (), centerAfterTransformation);
+
+        }
     }
 }

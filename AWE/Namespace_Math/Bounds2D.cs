@@ -28,6 +28,10 @@ namespace AWE.Math {
         public float width => (this.right - this.left);
         public float height => (this.top - this.bottom);
 
+        public bool isValid => (
+            (this.width > SFloatMath.MINIMUM_DIFFERENCE) || (this.height > SFloatMath.MINIMUM_DIFFERENCE)
+        );
+
         public float this [EDirection direction] {
 
             get {

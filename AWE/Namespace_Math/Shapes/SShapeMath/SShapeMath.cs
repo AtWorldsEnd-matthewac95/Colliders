@@ -12,9 +12,10 @@ namespace AWE.Math {
 
         public static pair2f GetCenter (ReadOnlyCollection<pair2f> shape, Action<pair2f> forEach) {
 
+            var count = shape.Count;
             float xcenter = 0f, ycenter = 0f;
 
-            for (int i = 0; i < shape.Count; i++) {
+            for (int i = 0; i < count; i++) {
 
                 xcenter += shape[i].x;
                 ycenter += shape[i].y;
@@ -24,8 +25,8 @@ namespace AWE.Math {
             }
 
             return new pair2f (
-                (xcenter / shape.Count),
-                (ycenter / shape.Count)
+                (xcenter / count),
+                (ycenter / count)
             );
 
         }

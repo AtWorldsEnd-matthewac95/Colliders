@@ -4,17 +4,13 @@ using System.Collections.Generic;
 namespace AWE.Moving {
 
     public abstract class ATransformation<TValueType, TTranslation, TRotation, TDilation>
-        : ITransformation<TValueType, TTranslation, TRotation, TDilation>,
+        : ITransformation,
         IEquatable<ATransformation<TValueType, TTranslation, TRotation, TDilation>>
         where TValueType : struct
         where TTranslation : IReadOnlyList<TValueType>
         where TRotation : IReadOnlyList<TValueType>
         where TDilation : IReadOnlyList<TValueType>
     {
-
-        IReadOnlyList<TValueType> ITransformation<TValueType>.translation => this.translation;
-        IReadOnlyList<TValueType> ITransformation<TValueType>.rotation => this.rotation;
-        IReadOnlyList<TValueType> ITransformation<TValueType>.dilation => this.dilation;
 
         public TTranslation translation { get; protected set; }
         public TRotation rotation { get; protected set; }
@@ -40,13 +36,9 @@ namespace AWE.Moving {
 
             ITransformation sum = null;
 
-            if (other is ITransformation<TValueType, TTranslation, TRotation, TDilation> otherITransformation) {
+            if (other is ATransformation<TValueType, TTranslation, TRotation, TDilation> otherTransformation) {
 
-                sum = this.Add (otherITransformation);
-
-            } else if (other is ITransformation<TValueType> otherITransformationV) {
-
-                sum = this.Add (otherITransformationV);
+                sum = this.Add (otherTransformation);
 
             }
 
@@ -54,11 +46,6 @@ namespace AWE.Moving {
 
         }
 
-        public abstract ITransformation<TValueType> Add (ITransformation<TValueType> other);
-
-        ITransformation<TValueType, TTranslation, TRotation, TDilation> ITransformation<TValueType, TTranslation, TRotation, TDilation>.Add (
-            ITransformation<TValueType, TTranslation, TRotation, TDilation> other
-        ) => this._Add (other.translation, other.rotation, other.dilation);
         protected abstract ATransformation<TValueType, TTranslation, TRotation, TDilation> _Add (
             TTranslation translation,
             TRotation rotation,
@@ -69,13 +56,9 @@ namespace AWE.Moving {
 
             ITransformation difference = null;
 
-            if (other is ITransformation<TValueType, TTranslation, TRotation, TDilation> otherITransformation) {
+            if (other is ATransformation<TValueType, TTranslation, TRotation, TDilation> otherTransformation) {
 
-                difference = this.Subtract (otherITransformation);
-
-            } else if (other is ITransformation<TValueType> otherITransformationV) {
-
-                difference = this.Subtract (otherITransformationV);
+                difference = this.Subtract (otherTransformation);
 
             }
 
@@ -83,11 +66,6 @@ namespace AWE.Moving {
 
         }
 
-        public abstract ITransformation<TValueType> Subtract (ITransformation<TValueType> other);
-
-        ITransformation<TValueType, TTranslation, TRotation, TDilation> ITransformation<TValueType, TTranslation, TRotation, TDilation>.Subtract (
-            ITransformation<TValueType, TTranslation, TRotation, TDilation> other
-        ) => this._Subtract (other.translation, other.rotation, other.dilation);
         protected abstract ATransformation<TValueType, TTranslation, TRotation, TDilation> _Subtract (
             TTranslation translation,
             TRotation rotation,
@@ -101,14 +79,6 @@ namespace AWE.Moving {
             if (other is ATransformation<TValueType, TTranslation, TRotation, TDilation> otherTransformation) {
 
                 isEqual = this.Equals (otherTransformation);
-
-            } else if (other is ITransformation<TValueType, TTranslation, TRotation, TDilation> otherITransformation) {
-
-                isEqual = this.Equals (otherITransformation);
-
-            } else if (other is ITransformation<TValueType> otherITransformationV) {
-
-                isEqual = this.Equals (otherITransformationV);
 
             }
 
@@ -133,60 +103,19 @@ namespace AWE.Moving {
             }
         }
 
-        public bool Equals (ITransformation<TValueType> other) {
+        public bool Equals (ITransformation other) {
 
-            var translationCount = this.translation.Count;
-            var rotationCount = this.rotation.Count;
-            var dilationCount = this.dilation.Count;
+            var isEqual = false;
 
-            var isValueSame = true;
-            var isDimensionSame = (
-                (translationCount == other.translation.Count)
-                && (rotationCount == other.rotation.Count)
-                && (dilationCount == other.dilation.Count)
-            );
+            if (other is ATransformation<TValueType, TTranslation, TRotation, TDilation> atransformation) {
 
-            if (isDimensionSame) {
+                isEqual = this.Equals (atransformation);
 
-                var maxCount = System.Math.Max (
-                    System.Math.Max (translationCount, rotationCount),
-                    dilationCount
-                );
-
-                for (int i = 0; i < maxCount; i++) {
-
-                    if ((i < translationCount) && !this.translation[i].Equals(other.translation[i])) {
-
-                        isValueSame = false;
-                        break;
-
-                    }
-
-                    if ((i < rotationCount) && !this.rotation[i].Equals(other.rotation[i])) {
-
-                        isValueSame = false;
-                        break;
-
-                    }
-
-                    if ((i < dilationCount) && !this.dilation[i].Equals(other.dilation[i])) {
-
-                        isValueSame = false;
-                        break;
-
-                    }
-                }
             }
 
-            return (isDimensionSame && isValueSame);
+            return isEqual;
 
         }
-
-        public bool Equals (ITransformation<TValueType, TTranslation, TRotation, TDilation> other) => (
-            this.translation.Equals (other.translation)
-            && this.rotation.Equals (other.rotation)
-            && this.dilation.Equals (other.dilation)
-        );
         public bool Equals (ATransformation<TValueType, TTranslation, TRotation, TDilation> other) => (
             this.translation.Equals (other.translation)
             && this.rotation.Equals (other.rotation)

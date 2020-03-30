@@ -11,11 +11,16 @@ namespace AWE.Math {
     public struct pair2f : IPair<float>, IEquatable<pair2f> {
 
         public static readonly pair2f origin;
+        public static readonly pair2f one;
         public static readonly pair2f nan;
 
         static pair2f () {
 
             origin = new pair2f ();
+            one = new pair2f () {
+                x = 1f,
+                y = 1f
+            };
             nan = new pair2f () {
                 x = float.NaN,
                 y = float.NaN
@@ -64,6 +69,10 @@ namespace AWE.Math {
         public static pair2f operator / (pair2f p, float f) => new pair2f ((p.x / f), (p.y / f));
 
         public static pair2f operator - (pair2f p) => new pair2f (-p.x, -p.y);
+
+        public static pair2f operator + (pair2f p, angle a) => p.Rotate (a, clockwise: true);
+
+        public static pair2f operator - (pair2f p, angle a) => p.Rotate (a, clockwise: false);
 
         public float x { get; private set; }
         public float y { get; private set; }
@@ -141,6 +150,8 @@ namespace AWE.Math {
             }
         }
 
+        public bool isZero => ((this.x == 0f) && (this.y == 0f));
+        public bool isOne => ((this.x - 1f).IsNegligible () && (this.y - 1f).IsNegligible ());
         public bool isNan => (Single.IsNaN (this.x) || Single.IsNaN (this.y));
 
         float IPair<float>.opposite (int index) {
@@ -221,13 +232,20 @@ namespace AWE.Math {
 
         public EDirection ToDirection () => EDirection.None.Add (this);
 
-        public void Deconstruct (out float one, out float two) {
+        public void Deconstruct (out float first, out float second) {
 
-            one = this.x;
-            two = this.y;
+            first = this.x;
+            second = this.y;
 
         }
 
         public override string ToString () => String.Format ("({0}, {1})", this.x, this.y);
+
+        public pair2f Rotate (angle rotation, bool clockwise = true) {
+
+            var a = (clockwise ? (SFloatMath.Arctangent (this) + rotation) : (SFloatMath.Arctangent (this) - rotation));
+            return (this.magnitude * new pair2f (SFloatMath.Cosine (a), SFloatMath.Sine (a)));
+
+        }
     }
 }

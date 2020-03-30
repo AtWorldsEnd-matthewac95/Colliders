@@ -1,0 +1,171 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+
+public class Program {
+
+	public static void Main () {
+
+		var test = new Test1<string> ();
+		
+		var col1 = test.MakeEmptyContentIfNull ().content;
+		
+		Console.WriteLine (
+			" ********************** \n" +
+			" *     BEGIN TEST     * \n" +
+			" ********************** \n" +
+			"\n"
+		);
+		
+		PrintCollection (col1, "First Collection: ");
+		
+		var col2 = test.ClearAndReset ().AddStuff ("hello", "world", ":D").content;
+		
+		Console.WriteLine ("\nCleared, reset, then added the following: \"hello\" \"world\" \":D\"\n");
+		
+		PrintCollection (col1, "First Collection (2): ");
+		PrintCollection (col2, "Second Collection: ");
+		
+		var col3 = test.Reset ().AddStuff ("adding", "more", "things").content;
+		
+		Console.WriteLine ("\nReset without clearing, then added the following: \"adding\" \"more\" \"things\"\n");
+		
+		PrintCollection (col2, "Second Collection (2): ");
+		PrintCollection (col3, "Third Collection: ");
+
+		var col4 = test.ClearAndReset ().AddStuff ("fresh", "new", "start").content;
+		test.Reset ();
+		
+		Console.WriteLine ("\nCleared, reset, added the following: \"fresh\" \"new\" \"start\", then reset without clearing.\n");
+		
+		PrintCollection (col4, "Fourth collection: ");
+		PrintCollection (col3, "Third collection (2): ");
+		PrintCollection (col2, "Second collection (3): ");
+		PrintCollection (col1, "First collection (3): ");
+		
+		Console.WriteLine (
+			"\n" +
+			"\n" +
+			" ********************** \n" +
+			" *      END TEST      * \n" +
+			" ********************** \n" +
+			"\n"
+		);
+		
+	}
+	
+	public static void PrintCollection<T> (IEnumerable<T> collection, string preface = "") {
+		
+		string message = preface + "[";
+		bool useComma = false;
+	
+		foreach (T t in collection) {
+			
+			if (useComma) {
+				
+				message += ", ";
+				
+			} else {
+				
+				useComma = true;
+				
+			}
+			
+			message += t.ToString ();
+			
+		}
+		
+		message += "]";
+		
+		Console.WriteLine (message);
+		
+	}
+}
+
+public static class SCollectionExtensions {
+
+	public static bool IsNullOrEmpty (this IEnumerable enumerable) {
+
+		bool isNullOrEmpty;
+
+		if (enumerable == null) {
+
+			isNullOrEmpty = true;
+
+		} else {
+
+			if (enumerable is ICollection) {
+
+				var collection = (enumerable as ICollection);
+				isNullOrEmpty = (collection.Count <= 0);
+
+			} else {
+
+				isNullOrEmpty = !((IEnumerable<object>)enumerable).Any ();
+
+			}
+		}
+
+		return isNullOrEmpty;
+
+	}
+}
+
+public class Test1<T> {
+
+	private List<T> _content;
+
+	public ReadOnlyCollection<T> content => this._content.AsReadOnly();
+
+	public Test1<T> MakeEmptyContentIfNull () {
+		
+		if (this._content == null) {
+			
+			this._content = new List<T> ();
+			
+		}
+		
+		return this;
+		
+	}
+	
+	public Test1<T> Reset () {
+		
+		this._content = null;
+		return this;
+		
+	}
+
+	public Test1<T> Clear () {
+		
+		this._content?.Clear ();
+		return this;
+		
+	}
+
+	public Test1<T> ClearAndReset () {
+
+		return this.Clear ().Reset ();
+
+	}
+
+	public Test1<T> AddStuff (params T[] stuff) {
+
+		if (this._content.IsNullOrEmpty ()) {
+
+			this._content = new List<T> (stuff.Length);
+
+		}
+
+		foreach (T t in stuff) {
+
+			this._content.Add (t);
+
+		}
+		
+		return this;
+		
+	}
+}

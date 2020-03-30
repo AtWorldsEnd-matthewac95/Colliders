@@ -13,6 +13,8 @@ namespace AWE.Math {
         Polygon2DEdge this [int one, int two] { get; }
 
         new IPolygon2D CreateOffset (pair2f offset);
+        IPolygon2D CreateOffset (pair2f offset, angle rotation, pair2f center = default);
+        IPolygon2D CreateOffset (angle offset, pair2f center = default);
 
         int GetNextIndex (int index);
         int GetPreviousIndex (int index);

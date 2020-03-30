@@ -6,20 +6,7 @@ namespace AWE {
 
         public static LinkedListPosition<T> operator++ (LinkedListPosition<T> position) {
 
-            position._previous = position.current;
-
-            if (position.current == null) {
-
-                position.current = position._next;
-
-            } else {
-
-                position.current = position.current.next;
-
-            }
-
-            position._next = position.current?.next;
-
+            position.MoveNext ();
             return position;
 
         }

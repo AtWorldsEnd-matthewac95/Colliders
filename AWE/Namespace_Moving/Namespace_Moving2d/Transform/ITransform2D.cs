@@ -2,17 +2,18 @@ using AWE.Math;
 
 namespace AWE.Moving.Moving2D {
 
-    public interface ITransform2D : ITransform<float, pair2f, angle, pair2f> {
+    public interface ITransform2D : ITransform, IReadOnlyTransform2D {
 
-        new Transform2DState state { get; }
+        new IReadOnlyTransform2D AsReadOnly ();
 
-        event DTransform2DUpdate OnAnyChange;
-        event DTransform2DTransformation OnTransformation;
-        event DTransform2DTranslation OnTranslation;
-        event DTransform2DRotation OnRotation;
-        event DTransform2DDilation OnDilation;
-
-        void AddListener (ITransform2DListener listener);
+        BooleanNote TransformBy (Transformation2D transformation);
+        BooleanNote TranslateBy (pair2f translation);
+        BooleanNote RotateBy (angle rotation);
+        BooleanNote TransformTo (Transform2DState state);
+        BooleanNote TransformTo (Transformation2D transformation);
+        BooleanNote TranslateTo (pair2f position);
+        BooleanNote RotateTo (angle rotation);
+        BooleanNote DilateTo (pair2f dilation);
 
     }
 }

@@ -42,6 +42,10 @@ namespace AWE.Math {
 
         }
 
+        public static angle operator * (angle a, float s) => new angle ((a.value * s), a.mode);
+
+        public static angle operator * (float s, angle a) => new angle ((a.value * s), a.mode);
+
         public float value { get; }
         public EAngleMode mode { get; }
         public float trimmedValue { get; }

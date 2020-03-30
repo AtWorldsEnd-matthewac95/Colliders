@@ -14,7 +14,28 @@ namespace AWE.Moving.Moving2D {
 
         }
 
-        public Transformation2D () : base (pair2f.origin, new angle (0f, EAngleMode.Radian), new pair2f (1f, 1f)) {}
+        public static Transformation2D operator + (Transformation2D a, Transformation2D b) => new Transformation2D (
+            (a.translation + b.translation),
+            (a.rotation + b.rotation),
+            new pair2f (
+                (a.dilation.x * b.dilation.x),
+                (a.dilation.y * b.dilation.y)
+            )
+        );
+
+        public static Transformation2D operator - (Transformation2D a, Transformation2D b) => new Transformation2D (
+            (a.translation + b.translation),
+            (a.rotation + b.rotation),
+            new pair2f (
+                (a.dilation.x / b.dilation.x),
+                (a.dilation.y / b.dilation.y)
+            )
+        );
+
+        public static Transformation2D operator * (Transformation2D t, float s) => t.Scale (s);
+        public static Transformation2D operator * (float s, Transformation2D t) => t.Scale (s);
+
+        public Transformation2D () : base (pair2f.origin, new angle (0f, EAngleMode.Radian), pair2f.one) {}
 
         public Transformation2D (pair2f translation, angle rotation, pair2f dilation) : base (translation, rotation, dilation) {}
 
@@ -31,11 +52,11 @@ namespace AWE.Moving.Moving2D {
         public Transformation2D (pair2f delta, bool isDilation = false) : this (
             (isDilation ? pair2f.origin : delta),
             new angle (0f, EAngleMode.Radian),
-            (isDilation ? delta : new pair2f (1f, 1f))
+            (isDilation ? delta : pair2f.one)
         ) {
         }
 
-        public Transformation2D (angle rotation) : this (pair2f.origin, rotation, new pair2f (1f, 1f)) {}
+        public Transformation2D (angle rotation) : this (pair2f.origin, rotation, pair2f.one) {}
 
         public override ITransformation Add (ITransformation other) {
 
@@ -54,17 +75,6 @@ namespace AWE.Moving.Moving2D {
             return sum;
 
         }
-
-        public override ITransformation<float> Add (ITransformation<float> other) => new GenericTransformation<float> (
-            this,
-            other,
-            ((x, y) => (x + y)),
-            ((x, y) => (x - y)),
-            ((x, y) => (x * y)),
-            ((x, y) => ((y == 0f) ? x : (x / y))),
-            ((x, y) => (x + y)),
-            ((x, y) => (x * y))
-        );
 
         protected override ATransformation<float, pair2f, angle, pair2f> _Add (
             pair2f translation,
@@ -100,17 +110,6 @@ namespace AWE.Moving.Moving2D {
 
         }
 
-        public override ITransformation<float> Subtract (ITransformation<float> other) => new GenericTransformation<float> (
-            this,
-            other,
-            ((x, y) => (x + y)),
-            ((x, y) => (x - y)),
-            ((x, y) => (x * y)),
-            ((x, y) => ((y == 0f) ? x : (x / y))),
-            ((x, y) => (x - y)),
-            ((x, y) => ((y == 0f) ? x : (x / y)))
-        );
-
         protected override ATransformation<float, pair2f, angle, pair2f> _Subtract (
             pair2f translation,
             angle rotation,
@@ -127,10 +126,16 @@ namespace AWE.Moving.Moving2D {
             )
         );
 
+        public Transformation2D Scale (float scale, bool scaleDilation = false) => new Transformation2D (
+            (this.translation * scale),
+            (this.rotation * scale),
+            (scaleDilation ? (this.dilation * scale) : this.dilation)
+        );
+
         public override int GetHashCode () {
 
-            int basePrime = 73; // TODO - Get new primes
-            int multPrime = 47; // TODO - Get new primes
+            int basePrime = 43;
+            int multPrime = 61;
 
             unchecked {
 

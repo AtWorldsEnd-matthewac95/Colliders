@@ -1,0 +1,17 @@
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\bin\Debug\netcoreapp2.1\xunit.runner.visualstudio.dotnetcore.testadapter.dll
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\bin\Debug\netcoreapp2.1\xunit.runner.reporters.netcoreapp10.dll
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\bin\Debug\netcoreapp2.1\xunit.runner.utility.netcoreapp10.dll
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\bin\Debug\netcoreapp2.1\AWE Moving 2D Tests.deps.json
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\bin\Debug\netcoreapp2.1\AWE Moving 2D Tests.runtimeconfig.json
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\bin\Debug\netcoreapp2.1\AWE Moving 2D Tests.runtimeconfig.dev.json
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\bin\Debug\netcoreapp2.1\AWE Moving 2D Tests.dll
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\bin\Debug\netcoreapp2.1\AWE Moving 2D Tests.pdb
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\bin\Debug\netcoreapp2.1\ClassLibrary.dll
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\bin\Debug\netcoreapp2.1\ClassLibrary.pdb
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\obj\Debug\netcoreapp2.1\AWE Moving 2D Tests.csprojAssemblyReference.cache
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\obj\Debug\netcoreapp2.1\AWE Moving 2D Tests.csproj.CoreCompileInputs.cache
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\obj\Debug\netcoreapp2.1\AWE Moving 2D Tests.AssemblyInfoInputs.cache
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\obj\Debug\netcoreapp2.1\AWE Moving 2D Tests.AssemblyInfo.cs
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\obj\Debug\netcoreapp2.1\AWE Moving 2D Tests.csproj.CopyComplete
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\obj\Debug\netcoreapp2.1\AWE Moving 2D Tests.dll
+C:\Users\Matthew\Documents\Code\Colliders\AWE Moving 2D Tests\obj\Debug\netcoreapp2.1\AWE Moving 2D Tests.pdb

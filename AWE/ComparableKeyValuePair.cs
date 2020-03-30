@@ -29,7 +29,7 @@ namespace AWE {
             } else {
 
                 throw new ArgumentException (
-                    "Object is not a binary search tree item or key. "
+                    "Object is not a comparable key value pair of the same type. "
                     + other.GetType ().ToString () + " other"
                 );
 

@@ -33,9 +33,7 @@ namespace AWE.Math {
 
             get {
 
-                if (this._bounds.width < SFloatMath.MINIMUM_DIFFERENCE
-                    || this._bounds.height < SFloatMath.MINIMUM_DIFFERENCE
-                ) {
+                if (this._bounds.isValid) {
 
                     this._bounds = new Bounds2D (this.unoffsetVerticies);
 
@@ -66,9 +64,95 @@ namespace AWE.Math {
         private ConvexPolygon2D () {
 
             this._unoffsetVerticies = null;
-            this._bounds = new Bounds2D (Single.NaN, Single.NaN, Single.NaN, Single.NaN);
+            this._bounds = new Bounds2D (0f, 0f, 0f, 0f);
             this._center = pair2f.nan;
             this._isConvex = false;
+
+        }
+
+        private ConvexPolygon2D (ReadOnlyCollection<pair2f> verticies, bool isConvex, pair2f center) {
+
+            if (verticies.Count < SShapeMath.MINIMUM_VERTEX_COUNT) {
+
+                // TODO - Throw an exception
+
+            }
+
+            var first = verticies[0];
+            float right = first.x, top = first.y, left = first.x, bottom = first.y;
+
+            if (isConvex) {
+
+                this._center = center;
+
+                this._unoffsetVerticies = new List<pair2f> ();
+                for (int i = 0; i < verticies.Count; i++) {
+
+                    var point = verticies[i];
+                    this._unoffsetVerticies.Add (point);
+
+                    if (point.x > right) {
+
+                        right = point.x;
+
+                    }
+                    if (point.x > top) {
+
+                        top = point.y;
+
+                    }
+                    if (point.x < left) {
+
+                        left = point.x;
+
+                    }
+                    if (point.y < bottom) {
+
+                        bottom = point.y;
+
+                    }
+                }
+
+                this._bounds = new Bounds2D (right, top, left, bottom);
+
+            } else {
+
+                float xcenter = 0f, ycenter = 0f;
+
+                this._unoffsetVerticies = SShapeMath.GetConvexHull (verticies, (point => {
+
+                    xcenter += point.x;
+                    ycenter += point.y;
+
+                    if (point.x > right) {
+
+                        right = point.x;
+
+                    }
+                    if (point.x > top) {
+
+                        top = point.y;
+
+                    }
+                    if (point.x < left) {
+
+                        left = point.x;
+
+                    }
+                    if (point.y < bottom) {
+
+                        bottom = point.y;
+
+                    }
+
+                }));
+
+                this._bounds = new Bounds2D (right, top, left, bottom);
+                this._center = new pair2f (xcenter, ycenter);
+
+            }
+
+            this._isConvex = true;
 
         }
 
@@ -726,6 +810,50 @@ namespace AWE.Math {
             }
 
             return polygon;
+
+        }
+
+        protected override APolygon2D _CreateOffset (pair2f offset, angle rotation, pair2f center = default) => this.CreateOffset (offset, rotation, center);
+        new public virtual ConvexPolygon2D CreateOffset (pair2f offset, angle rotation, pair2f center = default) {
+
+            if (center.isZero) {
+
+                center = this.center;
+
+            }
+
+            var points = new List<pair2f> ();
+
+            for (int i = 0; i < this.count; i++) {
+
+                var temp = (this[i] - center);
+                points.Add ((temp + rotation) + offset);
+
+            }
+
+            return new ConvexPolygon2D (points.AsReadOnly (), true, center);
+
+        }
+
+        protected override APolygon2D _CreateOffset (angle offset, pair2f center = default) => this.CreateOffset (offset, center);
+        new public virtual ConvexPolygon2D CreateOffset (angle offset, pair2f center = default) {
+
+            if (center.isZero) {
+
+                center = this.center;
+
+            }
+
+            var points = new List<pair2f> ();
+
+            for (int i = 0; i < this.count; i++) {
+
+                var temp = (this[i] - center);
+                points.Add (temp + offset);
+
+            }
+
+            return new ConvexPolygon2D (points.AsReadOnly (), true, center);
 
         }
 

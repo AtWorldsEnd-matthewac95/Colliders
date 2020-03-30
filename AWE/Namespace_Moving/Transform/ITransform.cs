@@ -2,52 +2,32 @@ using System.Collections.Generic;
 
 namespace AWE.Moving {
 
-    public interface ITransform {
+    public interface ITransform : IReadOnlyTransform {
 
-        ITransformState state { get; }
-
-        void AddListener (ITransformListener listener);
-
-    }
-
-    public interface ITransform<TValueType> : ITransform where TValueType : struct {
-
-        new ITransformState<TValueType> state { get; }
-        IReadOnlyList<TValueType> position { get; }
-        IReadOnlyList<TValueType> rotation { get; }
-        IReadOnlyList<TValueType> dilation { get; }
-
-        void AddListener (ITransformListener<TValueType> listener);
-        BooleanNote TransformBy (ITransformation<TValueType> transformation);
-        BooleanNote TranslateBy (IReadOnlyList<TValueType> translation);
-        BooleanNote RotateBy (IReadOnlyList<TValueType> rotation);
-        BooleanNote TransformTo (ITransformState<TValueType> state);
-        BooleanNote TransformTo (ITransformation<TValueType> transformation);
-        BooleanNote TranslateTo (IReadOnlyList<TValueType> position);
-        BooleanNote RotateTo (IReadOnlyList<TValueType> rotation);
-        BooleanNote DilateTo (IReadOnlyList<TValueType> dilation);
+        IReadOnlyTransform AsReadOnly ();
+        BooleanNote TransformBy (ITransformation transformation);
+        BooleanNote TransformTo (ITransformState state);
+        BooleanNote TransformTo (ITransformation transformation);
 
     }
 
-    public interface ITransform<TValueType, TTranslation, TRotation, TDilation>
-        : ITransform<TValueType>
+    public interface ITransform<TValueType, TTranslation, TRotation, TDilation, TTransformation, TTransformState>
+        : ITransform,
+        IReadOnlyTransform<TValueType, TTranslation, TRotation, TDilation, TTransformation, TTransformState>
         where TValueType : struct
         where TTranslation : IReadOnlyList<TValueType>
         where TRotation : IReadOnlyList<TValueType>
         where TDilation : IReadOnlyList<TValueType>
+        where TTransformation : ATransformation<TValueType, TTranslation, TRotation, TDilation>
+        where TTransformState : ATransformState<TValueType, TTranslation, TRotation, TDilation, TTransformation>
     {
 
-        new ITransformState<TValueType, TTranslation, TRotation, TDilation> state { get; }
-        new TTranslation position { get; }
-        new TRotation rotation { get; }
-        new TDilation dilation { get; }
-
-        void AddListener (ITransformListener<TValueType, TTranslation, TRotation, TDilation> listener);
-        BooleanNote TransformBy (ITransformation<TValueType, TTranslation, TRotation, TDilation> transformation);
+        new IReadOnlyTransform<TValueType, TTranslation, TRotation, TDilation, TTransformation, TTransformState> AsReadOnly ();
+        BooleanNote TransformBy (TTransformation transformation);
         BooleanNote TranslateBy (TTranslation translation);
         BooleanNote RotateBy (TRotation rotation);
-        BooleanNote TransformTo (ITransformState<TValueType, TTranslation, TRotation, TDilation> state);
-        BooleanNote TransformTo (ITransformation<TValueType, TTranslation, TRotation, TDilation> transformation);
+        BooleanNote TransformTo (TTransformState state);
+        BooleanNote TransformTo (TTransformation transformation);
         BooleanNote TranslateTo (TTranslation position);
         BooleanNote RotateTo (TRotation rotation);
         BooleanNote DilateTo (TDilation dilation);

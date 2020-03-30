@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE Moving 2D Tests\\AWE Moving 2D Tests.csproj": {}
+    "C:\\Users\\Matthew\\Documents\\Code\\Colliders\\AWE Moving 2D Tests\\AWE Moving 2D Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE Moving 2D Tests\\AWE Moving 2D Tests.csproj": {
+    "C:\\Users\\Matthew\\Documents\\Code\\Colliders\\AWE Moving 2D Tests\\AWE Moving 2D Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE Moving 2D Tests\\AWE Moving 2D Tests.csproj",
+        "projectUniqueName": "C:\\Users\\Matthew\\Documents\\Code\\Colliders\\AWE Moving 2D Tests\\AWE Moving 2D Tests.csproj",
         "projectName": "AWE Moving 2D Tests",
-        "projectPath": "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE Moving 2D Tests\\AWE Moving 2D Tests.csproj",
+        "projectPath": "C:\\Users\\Matthew\\Documents\\Code\\Colliders\\AWE Moving 2D Tests\\AWE Moving 2D Tests.csproj",
         "packagesPath": "C:\\Users\\Matthew\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE Moving 2D Tests\\obj\\",
+        "outputPath": "C:\\Users\\Matthew\\Documents\\Code\\Colliders\\AWE Moving 2D Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -30,8 +30,8 @@
         "frameworks": {
           "netcoreapp2.1": {
             "projectReferences": {
-              "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE\\AWE Moving 2D.csproj": {
-                "projectPath": "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE\\AWE Moving 2D.csproj"
+              "C:\\Users\\Matthew\\Documents\\Code\\Colliders\\AWE\\AWE Moving 2D.csproj": {
+                "projectPath": "C:\\Users\\Matthew\\Documents\\Code\\Colliders\\AWE\\AWE Moving 2D.csproj"
               }
             }
           }
@@ -71,12 +71,12 @@
         }
       }
     },
-    "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE\\AWE Moving 2D.csproj": {
+    "C:\\Users\\Matthew\\Documents\\Code\\Colliders\\AWE\\AWE Moving 2D.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE\\AWE Moving 2D.csproj",
+        "projectUniqueName": "C:\\Users\\Matthew\\Documents\\Code\\Colliders\\AWE\\AWE Moving 2D.csproj",
         "projectName": "AWE Moving 2D",
-        "projectPath": "C:\\Users\\Matthew\\Documents\\Code\\Movement\\awe-csharp-libs\\AWE\\AWE Moving 2D.csproj"
+        "projectPath": "C:\\Users\\Matthew\\Documents\\Code\\Colliders\\AWE\\AWE Moving 2D.csproj"
       },
       "frameworks": {
         "net461": {}

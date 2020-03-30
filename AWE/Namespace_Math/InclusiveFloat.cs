@@ -165,7 +165,9 @@ namespace AWE.Math {
                     "Object is not an InclusiveFloat or float. ",
                     other.GetType ().ToString () + " other"
                 );
+#pragma warning disable CS0162 // Unreachable code detected
             break;
+#pragma warning restore CS0162 // Unreachable code detected
 
             }
 

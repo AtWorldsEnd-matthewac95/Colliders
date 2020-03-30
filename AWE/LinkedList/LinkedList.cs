@@ -13,7 +13,16 @@ namespace AWE {
         public T endValue => this.end.value;
         public bool isEmpty => !this.front.hasValue;
 
+        public T this [LinkedListPosition<T> position] => (position.hasValue ? position.value : default);
+
         public LinkedList () {
+
+            // TODO - I don't think this is needed actually? Because all types are wrapped by Node classes, which are nullable?...
+            if (default(T) != null) {
+
+                throw new AweTypeArgumentException ("T must be a nullable type for LinkedList<T>. ");
+
+            }
 
             var nullpos = new LinkedListPosition<T> ();
 
@@ -22,7 +31,7 @@ namespace AWE {
 
         }
 
-        internal LinkedList (LinkedListNode<T> node) {
+        internal LinkedList (LinkedListNode<T> node) : this () {
 
             var position = node.AsPosition ();
 
@@ -42,7 +51,7 @@ namespace AWE {
             }
         }
 
-        public LinkedList (ReadOnlyCollection<T> values, Func<T, bool> addCondition) {
+        public LinkedList (ReadOnlyCollection<T> values, Func<T, bool> addCondition) : this () {
 
             for (int i = 0; i < values.Count; i++) {
 
@@ -56,7 +65,7 @@ namespace AWE {
             }
         }
 
-        public LinkedList (IEnumerable<T> values) {
+        public LinkedList (IEnumerable<T> values) : this () {
 
             foreach (var value in values) {
 
@@ -65,7 +74,7 @@ namespace AWE {
             }
         }
 
-        public LinkedList (IEnumerable<T> values, Func<T, bool> addCondition) {
+        public LinkedList (IEnumerable<T> values, Func<T, bool> addCondition) : this () {
 
             foreach (var value in values) {
 

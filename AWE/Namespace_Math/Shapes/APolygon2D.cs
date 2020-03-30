@@ -25,11 +25,17 @@ namespace AWE.Math {
         );
 
         protected abstract APolygon2D _CreateOffset (pair2f offset);
+        protected abstract APolygon2D _CreateOffset (pair2f offset, angle rotation, pair2f center = default);
+        protected abstract APolygon2D _CreateOffset (angle offset, pair2f center = default);
         public abstract bool IsContainingPoint (pair2f point);
 
-        IShape2D IShape2D.CreateOffset (pair2f offset) => this.CreateOffset (offset);
-        IPolygon2D IPolygon2D.CreateOffset (pair2f offset) => this.CreateOffset (offset);
+        IShape2D IShape2D.CreateOffset (pair2f offset) => this._CreateOffset (offset);
+        IPolygon2D IPolygon2D.CreateOffset (pair2f offset) => this._CreateOffset (offset);
         public APolygon2D CreateOffset (pair2f offset) => this._CreateOffset (offset);
+        IPolygon2D IPolygon2D.CreateOffset (pair2f offset, angle rotation, pair2f center) => this._CreateOffset (offset, rotation, center);
+        public APolygon2D CreateOffset (pair2f offset, angle rotation, pair2f center = default) => this._CreateOffset (offset, rotation, center);
+        IPolygon2D IPolygon2D.CreateOffset (angle offset, pair2f center) => this._CreateOffset (offset, center);
+        public APolygon2D CreateOffset (angle offset, pair2f center = default) => this._CreateOffset (offset, center);
 
         public bool IsIndexValid (int index) => ((index >= 0) && (index < this.count));
 
