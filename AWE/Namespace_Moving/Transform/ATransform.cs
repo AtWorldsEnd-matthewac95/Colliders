@@ -31,6 +31,7 @@ namespace AWE.Moving {
         public abstract void AddListener (ITransformListener listener);
 
         #region ITransform explicit implementations
+
         BooleanNote ITransform.TransformBy (ITransformation transformation) {
 
             var note = new BooleanNote (false, "Given transformation was not of the right type.");
@@ -44,7 +45,7 @@ namespace AWE.Moving {
             return note;
 
         }
-        
+
         BooleanNote ITransform.TransformTo (ITransformState state) {
 
             var note = new BooleanNote (false, "Given transform state was not of the right type.");
@@ -72,6 +73,7 @@ namespace AWE.Moving {
             return note;
 
         }
+
         #endregion
 
         public abstract BooleanNote TransformTo (TTransformState state);
@@ -84,25 +86,9 @@ namespace AWE.Moving {
         protected abstract BooleanNote Translate (TTranslation translation);
         protected abstract BooleanNote Rotate (TRotation rotation);
 
-        public virtual BooleanNote TransformBy (TTransformation transformation) {
+        public virtual BooleanNote TransformBy (TTransformation transformation) => this.Transform (transformation);
+        public virtual BooleanNote TranslateBy (TTranslation translation) => this.Translate (translation);
+        public virtual BooleanNote RotateBy (TRotation rotation) => this.Rotate (rotation);
 
-            var note = this.Transform (transformation);
-            return note;
-
-        }
-
-        public virtual BooleanNote TranslateBy (TTranslation translation) {
-
-            var note = this.Translate (translation);
-            return note;
-
-        }
-
-        public virtual BooleanNote RotateBy (TRotation rotation) {
-
-            var note = this.Rotate (rotation);
-            return note;
-
-        }
     }
 }

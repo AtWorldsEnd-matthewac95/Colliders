@@ -1,4 +1,6 @@
-﻿namespace AWE.Moving.Collisions {
+﻿using System;
+
+namespace AWE.Moving.Collisions {
 
     /*
      * TCA Collider
@@ -9,6 +11,8 @@
      * state transition without locking down the collider whose state you're looking at.
      */
     public class TempCollider<TColliderState> : ICollider<TColliderState> where TColliderState : IColliderState {
+
+        public event DColliderStateChange<TColliderState> OnNextStateChange;
 
         IColliderState ICollider.currentState => this.currentState;
 

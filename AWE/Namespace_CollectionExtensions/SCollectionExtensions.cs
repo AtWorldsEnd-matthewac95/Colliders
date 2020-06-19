@@ -34,6 +34,20 @@ namespace AWE.CollectionExtensions {
 
         }
 
+        public static List<T> AddAll<T> (this List<T> destination, ReadOnlyCollection<T> source) => AddSome (destination, source, 0, source.Count);
+
+        public static List<T> AddSome<T> (this List<T> destination, ReadOnlyCollection<T> source, int startAt, int stopBefore) {
+
+            for (int i = startAt; i < stopBefore; i++) {
+
+                destination.Add (source[i]);
+
+            }
+
+            return destination;
+
+        }
+
         internal static List<T> RemoveSeveralAt<T> (this List<T> list, params int[] indicies) {
 
             var removed = new List<T> ();

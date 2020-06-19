@@ -3,7 +3,7 @@ using System;
 
 namespace AWE.Moving {
 
-    public class TransformPathCursor<TTransformState> : ICloneable where TTransformState : ITransformState {
+    public class TransformPathCursor<TTransformState> : ITransformPathCursor<TTransformState>, ICloneable where TTransformState : ITransformState {
 
         private bool isCurrentOutdated;
         private float _position;
@@ -14,6 +14,7 @@ namespace AWE.Moving {
 
         public float next => (this._position + this.speed);
 
+        float IReadOnlyTransformPathCursor<TTransformState>.speed => this._speed;
         public float speed {
 
             get => this._speed;
@@ -27,6 +28,7 @@ namespace AWE.Moving {
             }
         }
 
+        float IReadOnlyTransformPathCursor<TTransformState>.position => this._position;
         public float position {
 
             get => this._position;
@@ -95,6 +97,9 @@ namespace AWE.Moving {
 
             }
         }
+
+        IReadOnlyTransformPathCursor<TTransformState> ITransformPathCursor<TTransformState>.AsReadOnly () => this.AsReadOnly ();
+        public ReadOnlyTransformPathCursor<TTransformState> AsReadOnly () => new ReadOnlyTransformPathCursor<TTransformState> (this);
 
         protected virtual void OnSpeedChange () {}
         protected virtual void OnPositionChange () {}

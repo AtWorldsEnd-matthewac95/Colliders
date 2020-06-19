@@ -1,5 +1,7 @@
 ﻿using AWE.Math;
 using AWE.Moving.Collisions;
+using System;
+using System.Collections.Generic;
 
 namespace AWE.Moving.Moving2D {
 
@@ -75,9 +77,94 @@ namespace AWE.Moving.Moving2D {
         }
         public ConvexPolygonCollider2DState Subtract (Transformation2D transformation) => new ConvexPolygonCollider2DState (
             this.collider,
-            this.polygon.Add (transformation).current,
-            (this.transformState + transformation)
+            this.polygon.Subtract (transformation).current,
+            (this.transformState - transformation)
         );
 
+        public List<float> CreateInterpolationSteps (Transform2DState destination) {
+
+            var interpolationSteps = new List<float> ();
+
+            var transformation = (destination - this.transformState);
+            var interpolationStep = this.FindInterpolationStep (transformation);
+
+            if (!Single.IsNaN (interpolationStep)) {
+
+                var sum = interpolationStep;
+
+                while (sum < 1f) {
+
+                    interpolationSteps.Add (sum);
+                    sum += interpolationStep;
+
+                }
+            }
+
+            return interpolationSteps;
+
+        }
+
+        private float FindInterpolationStep (Transformation2D transformation) {
+
+            var interpolationStep = Single.NaN;
+
+            var polygon = this.polygon.current;
+            var translationMagnitude = transformation.translation.magnitude;
+
+            if (translationMagnitude <= polygon.minimalRadius) {
+
+                return interpolationStep;
+
+            }
+
+            var furthest = Single.NegativeInfinity;
+            var isFurther = new ValueMonitor<bool> ();
+            var verticies = this.polygon.current.CreateVertexIterator ();
+
+            for (verticies--; verticies.cycles < 1; verticies++) {
+
+                var dot = SFloatMath.GetDotProduct (verticies.current, transformation.translation);
+
+                if (isFurther.Set (dot > furthest) && !isFurther.value) {
+
+                    verticies--;
+                    break;
+
+                }
+
+                if (isFurther.value) {
+
+                    furthest = dot;
+
+                }
+            }
+
+            var polygonIntersection = SShapeMath.FindIntersectionOfLineSegments (
+                polygon.center,
+                (polygon.center + transformation.translation),
+                verticies.current,
+                verticies.next
+            );
+
+            if (polygonIntersection.isNan) {
+
+                polygonIntersection = SShapeMath.FindIntersectionOfLineSegments (
+                    polygon.center,
+                    (polygon.center + transformation.translation),
+                    verticies.current,
+                    verticies.previous
+                );
+
+            }
+
+            if (!polygonIntersection.isNan) {
+
+                interpolationStep = ((polygonIntersection - polygon.center).magnitude / translationMagnitude);
+
+            }
+
+            return interpolationStep;
+
+        }
     }
 }

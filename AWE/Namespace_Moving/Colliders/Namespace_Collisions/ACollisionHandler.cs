@@ -13,7 +13,11 @@ namespace AWE.Moving.Collisions {
 
         public virtual void HandleCollisions () {
 
+            OnBeginCollisionAnalysis ();
 
+            // This is where I last left off.
+
+            OnEndCollisionAnalysis ();
 
         }
     }

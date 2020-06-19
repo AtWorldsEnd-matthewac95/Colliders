@@ -25,6 +25,9 @@ namespace AWE.UnitTests.XUnit.Math {
 
             public override bool IsContainingPoint (pair2f point) => SShapeMath.IsPointInConvexShape (point, this.unoffsetVerticies);
 
+            protected override APolygon2D _CreateOffset (angle offset, pair2f center = default) => throw new System.NotImplementedException ();
+            protected override APolygon2D _CreateOffset (pair2f offset, angle rotation, pair2f center = default) => throw new System.NotImplementedException ();
+
             protected override APolygon2D _CreateOffset (pair2f offset) => this.CreateOffset (offset);
             new public TestPolygon CreateOffset (pair2f offset) => new TestPolygon (this._verticies.Select (point => (point + offset)).ToList ());
 

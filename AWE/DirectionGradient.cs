@@ -175,8 +175,8 @@ namespace AWE {
 
         public EDirection Project (EDirection direction) {
 
-            int myInt = (int)this.current;
-            int givenInt = (int)direction;
+            var myInt = (int)this.current;
+            var givenInt = (int)direction;
 
             return projectionMatrix[myInt, givenInt];
 
@@ -184,8 +184,8 @@ namespace AWE {
 
         public EDirection Disproject (EDirection direction) {
 
-            int myInt = (int)this.current;
-            int givenInt = (int)direction;
+            var myInt = (int)this.current;
+            var givenInt = (int)direction;
 
             return disprojectionMatrix[myInt, givenInt];
 
@@ -193,7 +193,7 @@ namespace AWE {
 
         public bool IsHorizontal (bool strict = true) {
 
-            var isHorizontal = false;
+            bool isHorizontal;
 
             if (strict) {
 
@@ -218,7 +218,7 @@ namespace AWE {
 
         public bool IsVertical (bool strict = true) {
 
-            var isVertical = false;
+            bool isVertical;
 
             if (strict) {
 
@@ -243,7 +243,7 @@ namespace AWE {
 
         public bool IsRight (bool strict = false) {
 
-            var isRight = false;
+            bool isRight;
 
             if (strict) {
 
@@ -265,7 +265,7 @@ namespace AWE {
 
         public bool IsUp (bool strict = false) {
 
-            var isUp = false;
+            bool isUp;
 
             if (strict) {
 
@@ -287,7 +287,7 @@ namespace AWE {
 
         public bool IsLeft (bool strict = false) {
 
-            var isLeft = false;
+            bool isLeft;
 
             if (strict) {
 
@@ -309,7 +309,7 @@ namespace AWE {
 
         public bool IsDown (bool strict = false) {
 
-            var isDown = false;
+            bool isDown;
 
             if (strict) {
 

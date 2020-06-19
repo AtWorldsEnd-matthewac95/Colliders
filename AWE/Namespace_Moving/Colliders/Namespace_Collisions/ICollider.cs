@@ -1,4 +1,6 @@
-﻿namespace AWE.Moving.Collisions {
+﻿using System;
+
+namespace AWE.Moving.Collisions {
 
     public interface ICollider {
 
@@ -9,6 +11,8 @@
     }
 
     public interface ICollider<out TColliderState> : ICollider where TColliderState : IColliderState {
+
+        event DColliderStateChange<TColliderState> OnNextStateChange;
 
         new TColliderState currentState { get; }
 

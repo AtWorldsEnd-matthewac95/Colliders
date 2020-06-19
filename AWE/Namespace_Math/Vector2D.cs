@@ -94,16 +94,7 @@ namespace AWE.Math {
             }
         }
 
-        public Vector2D (
-            pair2f head,
-            pair2f tail
-        ) : this (
-            head.x,
-            head.y,
-            tail.x,
-            tail.y
-        ) {
-        }
+        public Vector2D (pair2f head, pair2f tail) : this (head.x, head.y, tail.x, tail.y) {}
 
         public Vector2D (pair2f position) : this () {
 

@@ -358,13 +358,13 @@ namespace AWE.Math {
 
         IEnumerator IEnumerable.GetEnumerator() {
 
-            yield return this.trimmedValue;
+            yield return this.value;
 
         }
 
         IEnumerator<float> IEnumerable<float>.GetEnumerator() {
 
-            yield return this.trimmedValue;
+            yield return this.value;
 
         }
     }

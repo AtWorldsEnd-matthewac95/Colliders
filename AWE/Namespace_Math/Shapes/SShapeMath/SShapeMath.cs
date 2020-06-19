@@ -8,9 +8,7 @@ namespace AWE.Math {
 
         public const int MINIMUM_VERTEX_COUNT = 3;
 
-        public static pair2f GetCenter (ReadOnlyCollection<pair2f> shape) => GetCenter (shape, (point => {}));
-
-        public static pair2f GetCenter (ReadOnlyCollection<pair2f> shape, Action<pair2f> forEach) {
+        public static pair2f GetCenter (ReadOnlyCollection<pair2f> shape) {
 
             var count = shape.Count;
             float xcenter = 0f, ycenter = 0f;
@@ -19,8 +17,6 @@ namespace AWE.Math {
 
                 xcenter += shape[i].x;
                 ycenter += shape[i].y;
-
-                forEach (shape[i]);
 
             }
 
@@ -89,31 +85,7 @@ namespace AWE.Math {
 
         }
 
-        public static pair2f GetFurthestPointInDirection (pair2f[] points, pair2f direction) {
-
-            var furthest = pair2f.origin;
-            var distance = float.NaN;
-
-            for (int i = 0; i < points.Length; i++) {
-
-                var current = (
-                    (points[i].x * direction.x)
-                    + (points[i].y * direction.y)
-                );
-
-                if (!(current <= distance)) {
-
-                    furthest = points[i];
-                    distance = current;
-
-                }
-            }
-
-            return furthest;
-
-        }
-
-        public static pair2f GetFurthestPointInDirection (List<pair2f> points, pair2f direction) {
+        public static pair2f GetFurthestPointInDirection (ReadOnlyCollection<pair2f> points, pair2f direction) {
 
             var furthest = pair2f.origin;
             var distance = float.NaN;
@@ -137,27 +109,29 @@ namespace AWE.Math {
 
         }
 
-        public static pair2f GetFurthestPointInDirection (IEnumerable<pair2f> points, pair2f direction) {
+        public static FloatRange GetExtremaDistancesFromPoint (ReadOnlyCollection<pair2f> shape, pair2f point) {
 
-            var furthest = pair2f.origin;
-            var distance = Single.NaN;
+            var furthest = 0f;
+            var closest = Single.PositiveInfinity;
+            var previousIndex = (shape.Count - 1);
 
-            foreach (var point in points) {
+            for (int index = 0; index < shape.Count; index++) {
 
-                var current = (
-                    (point.x * direction.x)
-                    + (point.y * direction.y)
-                );
+                var furthestDiff = (point - shape[index]);
+                var closestDiff = (point - SFloatMath.GetClosestOnLineSegmentToPoint (
+                    shape[previousIndex],
+                    shape[index],
+                    point
+                ));
 
-                if (!(current <= distance)) {
+                furthest = System.Math.Max (furthest, ((furthestDiff.x * furthestDiff.x) * (furthestDiff.y * furthestDiff.y)));
+                closest = System.Math.Min (closest, ((closestDiff.x * closestDiff.x) * (closestDiff.y * closestDiff.y)));
 
-                    furthest = point;
-                    distance = current;
+                previousIndex = index;
 
-                }
             }
 
-            return furthest;
+            return new FloatRange (((float)System.Math.Sqrt(closest)), ((float)System.Math.Sqrt(furthest)));
 
         }
     }

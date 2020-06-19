@@ -18,29 +18,21 @@ namespace AWE.Moving.Moving2D {
             this.agentTransform.state - this.currentState.transformState
         );
 
-        protected override ConvexPolygonCollider2DState CreateProjectedState (
-            ITransformation transformation,
-            float transformationScale = 1f
-        ) {
-
-            ConvexPolygonCollider2DState projected = null;
-
-            if (transformation is Transformation2D transformation2d) {
-
-                projected = this.CreateProjectedState (transformation2d, transformationScale);
-
-            }
-
-            return projected;
-
-        }
-
-        protected virtual ConvexPolygonCollider2DState CreateProjectedState (
-            Transformation2D transformation,
-            float transformationScale = 1f
+        protected override ConvexPolygonCollider2DState FindProjectedState (
+            Transform2DState destination,
+            float projectionScale = 1f
         ) => this.currentState.Add (
-            transformation * transformationScale
+            (destination - this.currentState.transformState) * projectionScale
         );
 
+        public override ColliderInterpolationIterator<ConvexPolygonCollider2DState> CreateInterpolationIterator (Transform2DState destination) {
+
+            var transformation = this.currentState.transformState - destination;
+
+            //if (this.currentState.)
+
+            return null;
+
+        }
     }
 }

@@ -1,13 +1,15 @@
-﻿namespace AWE.Moving.Collisions {
+﻿using System;
 
-    public interface ICollision { }
+namespace AWE.Moving.Collisions {
 
     public interface IColliderAgent<TTransformState> where TTransformState : ITransformState {
 
-        ColliderAgentPathCursor<TTransformState> fixedPathCursor { get; }
+        event Action<ReadOnlyColliderAgentPathCursor<TTransformState>> OnFixedPathChange;
+
+        ReadOnlyColliderAgentPathCursor<TTransformState> fixedPathCursor { get; }
+        ACollisionResponder collisionResponder { get; }
 
         bool IsUsingTransform (IReadOnlyTransform transform);
-        void RespondTo (ICollision collision);
 
     }
 }

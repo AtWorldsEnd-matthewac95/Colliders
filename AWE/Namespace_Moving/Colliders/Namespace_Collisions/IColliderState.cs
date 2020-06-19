@@ -1,4 +1,6 @@
-﻿namespace AWE.Moving.Collisions {
+﻿using System.Collections.Generic;
+
+namespace AWE.Moving.Collisions {
 
     public interface IColliderState {
 
@@ -10,9 +12,11 @@
 
     }
 
-    public interface IColliderState<out TTransformState> : IColliderState where TTransformState : ITransformState {
+    public interface IColliderState<TTransformState> : IColliderState where TTransformState : ITransformState {
 
         TTransformState transformState { get; }
+
+        List<float> CreateInterpolationSteps (TTransformState state);
 
     }
 }

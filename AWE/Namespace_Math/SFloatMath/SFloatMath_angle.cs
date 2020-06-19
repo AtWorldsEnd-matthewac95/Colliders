@@ -12,7 +12,7 @@ namespace AWE.Math {
 
         public static float Sine (angle theta) {
 
-            float sine = 0f;
+            float sine;
 
             if (theta.mode == EAngleMode.Auto) {
 
@@ -30,7 +30,7 @@ namespace AWE.Math {
 
         public static float Cosine (angle theta) {
 
-            float cosine = 0f;
+            float cosine;
 
             if (theta.mode == EAngleMode.Auto) {
 

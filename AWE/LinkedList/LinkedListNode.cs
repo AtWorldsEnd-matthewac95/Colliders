@@ -186,9 +186,7 @@ namespace AWE {
             this.previous = null;
 
             var parent = this.parent;
-
             this.parent = null;
-
             return parent;
 
         }

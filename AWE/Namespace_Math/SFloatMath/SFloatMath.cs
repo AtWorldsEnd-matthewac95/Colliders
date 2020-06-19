@@ -1,3 +1,5 @@
+using AWE.Math.FloatExtensions;
+
 namespace AWE.Math {
 
     public static partial class SFloatMath {
@@ -92,15 +94,15 @@ namespace AWE.Math {
 
         public static float TrimToRange (
             float value,
-            pair2f range,
+            FloatRange range,
             bool lowerInclusive = true,
             bool upperInclusive = false
         ) {
 
             return TrimToRange (
                 value,
-                range.x,
-                range.y,
+                range.lower,
+                range.upper,
                 lowerInclusive,
                 upperInclusive
             );
@@ -122,6 +124,56 @@ namespace AWE.Math {
             }
 
             return sign;
+
+        }
+
+        public static pair2f GetClosestOnLineSegmentToPoint (pair2f lineHead, pair2f lineTail, pair2f point) {
+
+            pair2f closest;
+
+            var lineDiff = lineHead - lineTail;
+
+            if (lineDiff.isNegligible) {
+
+                closest = lineHead;
+
+            } else {
+
+                var t = GetTOfClosestOnLine (lineTail, lineDiff.y, lineDiff.x, point);
+
+                if (t < 0f) {
+
+                    closest = lineTail;
+
+                } else if (t > 1f) {
+
+                    closest = lineHead;
+
+                } else {
+
+                    closest = (lineTail + (lineDiff * t));
+
+                }
+            }
+
+            return closest;
+
+        }
+
+        public static pair2f GetClosestOnLineToPoint (pair2f pointOnLine, float slope, pair2f point) {
+
+            var slopeVector = new pair2f (1f, slope);
+            return (pointOnLine + (slopeVector * GetTOfClosestOnLine (pointOnLine, slopeVector.y, slopeVector.x, point)));
+
+        }
+
+        private static float GetTOfClosestOnLine (pair2f lineBasePoint, float rise, float run, pair2f point) {
+
+            var pointDiff = point - lineBasePoint;
+            return (
+                ((rise * pointDiff.y) + (run * pointDiff.x))
+                / ((rise * rise) + (run * run))
+            );
 
         }
     }

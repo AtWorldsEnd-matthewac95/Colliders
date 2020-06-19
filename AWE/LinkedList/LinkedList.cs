@@ -13,7 +13,7 @@ namespace AWE {
         public T endValue => this.end.value;
         public bool isEmpty => !this.front.hasValue;
 
-        public T this [LinkedListPosition<T> position] => (position.hasValue ? position.value : default);
+        public T this [LinkedListPosition<T> position] => this.Get (position);
 
         public LinkedList () {
 
@@ -187,6 +187,22 @@ namespace AWE {
 
         }
 
+        public bool Contains (LinkedListPosition<T> position) => ((position != null) && (position.current.parent == this));
+
+        public T Get (LinkedListPosition<T> position, T nullval = default) {
+
+            var value = nullval;
+
+            if ((position.current.parent == this) && position.hasValue) {
+
+                value = position.value;
+
+            }
+
+            return value;
+
+        }
+
         public T GetNextOrFront (LinkedListPosition<T> position, T nullval = default) {
 
             var value = nullval;
@@ -258,6 +274,18 @@ namespace AWE {
 
             return value;
 
+        }
+
+        public void RemoveAll (ReadOnlyCollection<LinkedListPosition<T>> positions) {
+
+            for (int i = 0; i < positions.Count; i++) {
+
+                if (this.Contains (positions[i])) {
+
+                    this.Remove (positions[i]);
+
+                }
+            }
         }
 
         public void RemoveByCondition (
@@ -497,6 +525,12 @@ namespace AWE {
 
         }
 
+        protected virtual void Sort (Comparison<T> comparison, LinkedListPosition<T> sortBegin, LinkedListPosition<T> sortEnd) {
+
+            
+
+        }
+
         public List<T> AsList () {
 
             List<T> list = null;
@@ -515,5 +549,8 @@ namespace AWE {
             return list;
 
         }
+
+        public CyclicLinkedListIterator<T> GetCyclicIterator () => new CyclicLinkedListIterator<T> (this);
+
     }
 }

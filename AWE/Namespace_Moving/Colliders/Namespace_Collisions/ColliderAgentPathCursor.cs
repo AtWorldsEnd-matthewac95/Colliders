@@ -4,14 +4,18 @@ using AWE.Math.FloatExtensions;
 
 namespace AWE.Moving.Collisions {
 
-    public class ColliderAgentPathCursor<TTransformState> : TransformPathCursor<TTransformState> where TTransformState : ITransformState {
+    public class ColliderAgentPathCursor<TTransformState> : TransformPathCursor<TTransformState>, IColliderAgentPathCursor<TTransformState> where TTransformState : ITransformState {
 
         protected List<WeightedTransformState<TTransformState>> cachedInterpolations;
 
-        public ColliderAgentPathCursor (TransformPathCursor<TTransformState> cursor, bool evaluateCurrent) : this (
+        bool IReadOnlyColliderAgentPathCursor<TTransformState>.isInterpolatingWithAnchors => this.isInterpolatingWithAnchors;
+        public bool isInterpolatingWithAnchors { get; set; }
+
+        public ColliderAgentPathCursor (TransformPathCursor<TTransformState> cursor, bool evaluateCurrent, bool isInterpolatingWithAnchors = true) : this (
             cursor.pathAnchors,
             cursor.speed,
             cursor.position,
+            isInterpolatingWithAnchors,
             evaluateCurrent
         ) {
         }
@@ -20,12 +24,17 @@ namespace AWE.Moving.Collisions {
             TransformPathAnchors<TTransformState> pathAnchors,
             float speed,
             float position = 0f,
+            bool isInterpolatingWithAnchors = true,
             bool evaluateCurrent = false
         ) : base (pathAnchors, speed, position, evaluateCurrent) {
 
+            this.isInterpolatingWithAnchors = isInterpolatingWithAnchors;
             this.cachedInterpolations = null;
 
         }
+
+        IReadOnlyColliderAgentPathCursor<TTransformState> IColliderAgentPathCursor<TTransformState>.AsReadOnly () => this.AsReadOnly ();
+        new public ReadOnlyColliderAgentPathCursor<TTransformState> AsReadOnly () => new ReadOnlyColliderAgentPathCursor<TTransformState> (this);
 
         protected override void OnPositionChange () {
 
@@ -50,15 +59,18 @@ namespace AWE.Moving.Collisions {
 
         private void OnChange () => this.cachedInterpolations = null;
 
-        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection () => this.CreateInterpolationCollection (this.speed);
-        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection (float cursorSpeed) {
+        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection ()
+            => this.CreateInterpolationCollection (this.position, (this.position + this.speed));
+        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection (float cursorSpeed)
+            => this.CreateInterpolationCollection (this.position, (this.position + cursorSpeed));
+        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection (float start, float end) {
 
-            var isCurrentSpeed = (this.speed - cursorSpeed).IsNegligible ();
-            var interpolations = (isCurrentSpeed ? this.cachedInterpolations : null);
+            var isCurrentPositionAndSpeed = ((start - this.position).IsNegligible () && (end - start - this.speed).IsNegligible ());
+            var interpolations = (isCurrentPositionAndSpeed ? this.cachedInterpolations : null);
 
             if (interpolations == null) {
 
-                var anchors = this.pathAnchors.FindAnchorsWithinRange (this.position, (this.position + cursorSpeed), includeEndpoints: true);
+                var anchors = this.pathAnchors.FindAnchorsWithinRange (start, end, includeEndpoints: true);
                 interpolations = new List<WeightedTransformState<TTransformState>> (anchors.Count);
 
                 if (anchors.Count > 0) {
@@ -95,7 +107,7 @@ namespace AWE.Moving.Collisions {
                     }
                 }
 
-                if (isCurrentSpeed) {
+                if (isCurrentPositionAndSpeed) {
 
                     this.cachedInterpolations = interpolations;
 
@@ -111,25 +123,40 @@ namespace AWE.Moving.Collisions {
          *
          * Should the cursor function return the closest anchor state?
          * Or the interpolation between the two closest anchor states?
+         * Or the anchor state just after the given interpolation?
          */
-        public TTransformState CreateInterpolatedState (float interpolation) => this.CreateInterpolatedState (interpolation, this.speed);
-        public TTransformState CreateInterpolatedState (float interpolation, float cursorSpeed) {
+        public WeightedTransformState<TTransformState> CreateInterpolatedState (float interpolation)
+            => this.CreateInterpolatedState (interpolation, this.speed);
+        public WeightedTransformState<TTransformState> CreateInterpolatedState (float interpolation, float cursorSpeed) {
 
-            var interpolations = this.CreateInterpolationCollection (cursorSpeed);
-            var state = ((interpolations.Count > 0) ? interpolations[0].state : default);
+            var state = new WeightedTransformState<TTransformState> (
+                this.pathAnchors.path[this.position + (interpolation * cursorSpeed)],
+                interpolation
+            );
 
-            for (int i = 1; i < interpolations.Count; i++) {
+            if (this.isInterpolatingWithAnchors) {
 
-                var current = interpolations[i];
+                var interpolations = this.CreateInterpolationCollection (cursorSpeed);
 
-                if (current.weight > interpolation) {
+                if (interpolations.Count > 0) {
 
-                    break;
+                    state = interpolations[0];
 
-                } else {
+                }
 
-                    state = current.state;
+                for (int i = 1; i < interpolations.Count; i++) {
 
+                    var current = interpolations[i];
+
+                    if (current.weight > interpolation) {
+
+                        break;
+
+                    } else {
+
+                        state = current;
+
+                    }
                 }
             }
 

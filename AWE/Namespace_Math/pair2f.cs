@@ -108,15 +108,6 @@ namespace AWE.Math {
 
         public float this [bool getY] => (getY ? this.y : this.x);
 
-        public float magnitude {
-
-            get {
-
-                return ((this.x * this.x) + (this.y * this.y)).sqrt ();
-
-            }
-        }
-
         public EQuadrant quadrant {
 
             get {
@@ -150,7 +141,9 @@ namespace AWE.Math {
             }
         }
 
+        public float magnitude => ((this.x * this.x) + (this.y * this.y)).sqrt ();
         public bool isZero => ((this.x == 0f) && (this.y == 0f));
+        public bool isNegligible => (this.x.IsNegligible() && this.y.IsNegligible());
         public bool isOne => ((this.x - 1f).IsNegligible () && (this.y - 1f).IsNegligible ());
         public bool isNan => (Single.IsNaN (this.x) || Single.IsNaN (this.y));
 
