@@ -45,6 +45,25 @@ namespace AWE.Moving.Moving2D {
 
         }
 
+        public override void AddListener (ITransformListener<Transform2DState> listener) {
+
+            if (listener.hasOnAnyChange) this.OnAnyChange += listener.OnAnyChange;
+            if (listener.hasOnTransformation) this.OnTransformation += listener.OnTransformation;
+            if (listener.hasOnTranslation) this.OnTranslation += ((resultantState, translation) => listener.OnTranslation (
+                resultantState,
+                new Transformation2D (translation)
+            ));
+            if (listener.hasOnRotation) this.OnRotation += ((resultantState, rotation) => listener.OnRotation (
+                resultantState,
+                new Transformation2D (rotation)
+            ));
+            if (listener.hasOnDilation) this.OnDilation += ((resultantState, dilation) => listener.OnDilation (
+                resultantState,
+                new Transformation2D (dilation, isDilation: true)
+            ));
+
+        }
+
         public override void AddListener (ITransformListener listener) {
 
             if (listener.hasOnAnyChange) this.OnAnyChange += listener.OnAnyChange;

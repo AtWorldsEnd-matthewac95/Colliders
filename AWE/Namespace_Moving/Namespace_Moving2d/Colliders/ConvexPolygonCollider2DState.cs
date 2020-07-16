@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace AWE.Moving.Moving2D {
 
-    public class ConvexPolygonCollider2DState : IColliderState<Transform2DState> {
+    public class ConvexPolygonCollider2DState : ITransformColliderState<Transform2DState> {
 
         private readonly MovingConvexPolygon2D polygon;
 
@@ -164,6 +164,35 @@ namespace AWE.Moving.Moving2D {
             }
 
             return interpolationStep;
+
+        }
+
+        public float FindTranslationCollisionDistance (Transform2DState point) => this.FindTranslationCollisionDistance (point.position);
+        public float FindTranslationCollisionDistance (pair2f point) {
+
+            var collisionDistance = 0f;
+
+            var polygon = this.polygon.current;
+            var polygonCenter = polygon.center;
+
+            for (var edges = polygon.CreateEdgeIterator (); edges.cycles < 1; edges++) {
+
+                var polygonIntersection = SShapeMath.FindIntersectionOfLineSegments (
+                    polygonCenter,
+                    point,
+                    edges.current.head,
+                    edges.current.tail
+                );
+
+                if (!polygonIntersection.isNan) {
+
+                    collisionDistance = (point - polygonIntersection).magnitude;
+                    break;
+
+                }
+            }
+
+            return collisionDistance;
 
         }
     }

@@ -11,8 +11,19 @@ namespace AWE.Moving {
 
     }
 
-    public interface ITransform<TValueType, TTranslation, TRotation, TDilation, TTransformation, TTransformState>
+    public interface ITransform<TTransformState>
         : ITransform,
+        IReadOnlyTransform<TTransformState>
+        where TTransformState : ITransformState
+    {
+
+        new IReadOnlyTransform<TTransformState> AsReadOnly ();
+        BooleanNote TransformTo (TTransformState state);
+
+    }
+
+    public interface ITransform<TValueType, TTranslation, TRotation, TDilation, TTransformation, TTransformState>
+        : ITransform<TTransformState>,
         IReadOnlyTransform<TValueType, TTranslation, TRotation, TDilation, TTransformation, TTransformState>
         where TValueType : struct
         where TTranslation : IReadOnlyList<TValueType>
@@ -26,7 +37,6 @@ namespace AWE.Moving {
         BooleanNote TransformBy (TTransformation transformation);
         BooleanNote TranslateBy (TTranslation translation);
         BooleanNote RotateBy (TRotation rotation);
-        BooleanNote TransformTo (TTransformState state);
         BooleanNote TransformTo (TTransformation transformation);
         BooleanNote TranslateTo (TTranslation position);
         BooleanNote RotateTo (TRotation rotation);

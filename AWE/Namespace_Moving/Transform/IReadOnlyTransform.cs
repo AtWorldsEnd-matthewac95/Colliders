@@ -15,9 +15,12 @@ namespace AWE.Moving {
 
         new TTransformState state { get; }
 
+        void AddListener (ITransformListener<TTransformState> listener);
+
     }
 
-    public interface IReadOnlyTransform<TValueType, TPosition, TRotation, TDilation, TTransformation, TTransformState> : IReadOnlyTransform<TTransformState>
+    public interface IReadOnlyTransform<TValueType, TPosition, TRotation, TDilation, TTransformation, TTransformState>
+        : IReadOnlyTransform<TTransformState>
         where TValueType : struct
         where TPosition : IReadOnlyList<TValueType>
         where TRotation : IReadOnlyList<TValueType>
@@ -26,7 +29,6 @@ namespace AWE.Moving {
         where TTransformState : ATransformState<TValueType, TPosition, TRotation, TDilation, TTransformation>
     {
 
-        new TTransformState state { get; }
         TPosition position { get; }
         TRotation rotation { get; }
         TDilation dilation { get; }

@@ -43,11 +43,11 @@ namespace AWE {
 
         }
 
-        public bool Set (T value) {
+        public bool Set (T value, bool initialValueReturnsTrue = false) {
 
             this.OnSet (value);
 
-            var isDifferentValue = false;
+            bool isDifferentValue;
 
             if (this.isSet) {
 
@@ -67,6 +67,8 @@ namespace AWE {
                 }
 
             } else {
+
+                isDifferentValue = initialValueReturnsTrue;
 
                 this.isSet = true;
                 this.OnSetInitialValue (value);

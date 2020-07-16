@@ -59,18 +59,18 @@ namespace AWE.Moving.Collisions {
 
         private void OnChange () => this.cachedInterpolations = null;
 
-        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection ()
-            => this.CreateInterpolationCollection (this.position, (this.position + this.speed));
-        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection (float cursorSpeed)
-            => this.CreateInterpolationCollection (this.position, (this.position + cursorSpeed));
-        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection (float start, float end) {
+        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection (bool includeEndpoints = true)
+            => this.CreateInterpolationCollection (this.position, (this.position + this.speed), includeEndpoints);
+        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection (float cursorSpeed, bool includeEndpoints = true)
+            => this.CreateInterpolationCollection (this.position, (this.position + cursorSpeed), includeEndpoints);
+        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection (float start, float end, bool includeEndpoints = true) {
 
             var isCurrentPositionAndSpeed = ((start - this.position).IsNegligible () && (end - start - this.speed).IsNegligible ());
-            var interpolations = (isCurrentPositionAndSpeed ? this.cachedInterpolations : null);
+            var interpolations = (isCurrentPositionAndSpeed ? this.ReadCache (includeEndpoints) : null);
 
             if (interpolations == null) {
 
-                var anchors = this.pathAnchors.FindAnchorsWithinRange (start, end, includeEndpoints: true);
+                var anchors = this.pathAnchors.FindAnchorsWithinRange (start, end, includeEndpoints);
                 interpolations = new List<WeightedTransformState<TTransformState>> (anchors.Count);
 
                 if (anchors.Count > 0) {
@@ -109,7 +109,7 @@ namespace AWE.Moving.Collisions {
 
                 if (isCurrentPositionAndSpeed) {
 
-                    this.cachedInterpolations = interpolations;
+                    this.WriteCache (interpolations, endpointsIncluded: includeEndpoints);
 
                 }
             }
@@ -118,12 +118,70 @@ namespace AWE.Moving.Collisions {
 
         }
 
+        private List<WeightedTransformState<TTransformState>> ReadCache (bool includeEndpoints = true) {
+
+            List<WeightedTransformState<TTransformState>> cache;
+
+            if (includeEndpoints) {
+
+                cache = this.cachedInterpolations;
+
+            } else {
+
+                cache = new List<WeightedTransformState<TTransformState>> ();
+
+                for (int i = 1; i < (this.cachedInterpolations.Count - 1); i++) {
+
+                    cache.Add (this.cachedInterpolations[i]);
+
+                }
+            }
+
+            return cache;
+
+        }
+
+        private ReadOnlyCollection<WeightedTransformState<TTransformState>> WriteCache (
+            List<WeightedTransformState<TTransformState>> interpolations,
+            bool endpointsIncluded
+        ) {
+
+            if (endpointsIncluded) {
+
+                this.cachedInterpolations = interpolations;
+
+            } else {
+
+                var tmp = new List<WeightedTransformState<TTransformState>> ();
+                tmp.Add (new WeightedTransformState<TTransformState> (
+                    this.pathAnchors.path[this.position],
+                    this.position
+                ));
+
+                for (int i = 0; i < interpolations.Count; i++) {
+
+                    tmp.Add (interpolations[i]);
+
+                }
+
+                tmp.Add (new WeightedTransformState<TTransformState> (
+                    this.pathAnchors.path[this.next],
+                    this.next
+                ));
+                this.cachedInterpolations = tmp;
+
+            }
+
+            return this.cachedInterpolations.AsReadOnly ();
+
+        }
+
         /*
          * TODO
          *
          * Should the cursor function return the closest anchor state?
          * Or the interpolation between the two closest anchor states?
-         * Or the anchor state just after the given interpolation?
+         * Or the anchor state just after the given interpolation?     <-- Currently implementing this option.
          */
         public WeightedTransformState<TTransformState> CreateInterpolatedState (float interpolation)
             => this.CreateInterpolatedState (interpolation, this.speed);
@@ -146,15 +204,11 @@ namespace AWE.Moving.Collisions {
 
                 for (int i = 1; i < interpolations.Count; i++) {
 
-                    var current = interpolations[i];
+                    state = interpolations[i];
 
-                    if (current.weight > interpolation) {
+                    if (state.weight > interpolation) {
 
                         break;
-
-                    } else {
-
-                        state = current;
 
                     }
                 }

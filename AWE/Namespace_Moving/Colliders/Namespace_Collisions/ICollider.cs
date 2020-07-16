@@ -4,8 +4,10 @@ namespace AWE.Moving.Collisions {
 
     public interface ICollider {
 
+        ReadOnlyColliderProperties properties { get; }
         ICollisionHandler handler { get; }
         IColliderState currentState { get; }
+        IColliderState nextState { get; }
         bool isEnabled { get; }
 
     }
@@ -15,6 +17,7 @@ namespace AWE.Moving.Collisions {
         event DColliderStateChange<TColliderState> OnNextStateChange;
 
         new TColliderState currentState { get; }
+        new TColliderState nextState { get; }
 
     }
 }

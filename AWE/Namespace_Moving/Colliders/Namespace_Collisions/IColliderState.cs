@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace AWE.Moving.Collisions {
+﻿namespace AWE.Moving.Collisions {
 
     public interface IColliderState {
 
@@ -9,14 +7,6 @@ namespace AWE.Moving.Collisions {
         bool IsCollidingWith (IColliderState other);
         IColliderState Add (ITransformation transformation);
         IColliderState Subtract (ITransformation transformation);
-
-    }
-
-    public interface IColliderState<TTransformState> : IColliderState where TTransformState : ITransformState {
-
-        TTransformState transformState { get; }
-
-        List<float> CreateInterpolationSteps (TTransformState state);
 
     }
 }

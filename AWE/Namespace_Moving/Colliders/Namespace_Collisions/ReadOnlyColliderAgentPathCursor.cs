@@ -10,10 +10,14 @@ namespace AWE.Moving.Collisions {
 
         public ReadOnlyColliderAgentPathCursor (ColliderAgentPathCursor<TTransformState> cursor) : base (cursor) => this.cursor = cursor;
 
-        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection () => this.cursor.CreateInterpolationCollection ();
-        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection (float cursorSpeed) => this.cursor.CreateInterpolationCollection (cursorSpeed);
-        public WeightedTransformState<TTransformState> CreateInterpolatedState (float interpolation) => this.cursor.CreateInterpolatedState (interpolation);
-        public WeightedTransformState<TTransformState> CreateInterpolatedState (float interpolation, float cursorSpeed) => this.cursor.CreateInterpolatedState (interpolation, cursorSpeed);
+        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection (bool includeEndpoints = true)
+            => this.cursor.CreateInterpolationCollection ();
+        public ReadOnlyCollection<WeightedTransformState<TTransformState>> CreateInterpolationCollection (float cursorSpeed, bool includeEndpoints = true)
+            => this.cursor.CreateInterpolationCollection (cursorSpeed);
+        public WeightedTransformState<TTransformState> CreateInterpolatedState (float interpolation)
+            => this.cursor.CreateInterpolatedState (interpolation);
+        public WeightedTransformState<TTransformState> CreateInterpolatedState (float interpolation, float cursorSpeed)
+            => this.cursor.CreateInterpolatedState (interpolation, cursorSpeed);
 
         public override bool Equals (object other) {
 

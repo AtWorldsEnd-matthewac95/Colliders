@@ -18,6 +18,22 @@ namespace AWE.Moving {
 
     }
 
+    public interface ITransformListener<in TTransformState> where TTransformState : ITransformState {
+
+        bool hasOnAnyChange { get; }
+        bool hasOnTransformation { get; }
+        bool hasOnTranslation { get; }
+        bool hasOnRotation { get; }
+        bool hasOnDilation { get; }
+
+        void OnAnyChange (TTransformState resultantState);
+        void OnTransformation (TTransformState resultantState, ITransformation transformation);
+        void OnTranslation (TTransformState resultantState, ITransformation transformation);
+        void OnRotation (TTransformState resultantState, ITransformation transformation);
+        void OnDilation (TTransformState resultantState, ITransformation transformation);
+
+    }
+
     public interface ITransformListener<in TValueType, in TTranslation, in TRotation, in TDilation, in TTransformation, in TTransformState>
         where TValueType : struct
         where TTranslation : IReadOnlyList<TValueType>
